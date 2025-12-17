@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>SIAC — AFCON Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#0b0f1a;--panel:rgba(255,255,255,.08);--ink:#f8fafc;--muted:rgba(248,250,252,.72);--border:rgba(255,255,255,.12);--accent:#22c55e;--warn:#f59e0b;--radius:18px;--shadow:0 18px 50px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+html,body{margin:0;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--ink);background:radial-gradient(1200px 800px at 15% -10%, rgba(96,165,250,.18), transparent 60%), radial-gradient(1200px 800px at 110% 10%, rgba(34,197,94,.14), transparent 55%), var(--bg);}
+.top{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);background:rgba(11,15,26,.65);border-bottom:1px solid var(--border);}
+.bar{max-width:1200px;margin:0 auto;padding:14px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:16px}
+.sub{font-size:12px;color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{appearance:none;border:0;cursor:pointer;padding:10px 12px;border-radius:14px;font-weight:900}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#16a34a);color:#06120b}
+.btn.ghost{background:rgba(255,255,255,.10);color:var(--ink);border:1px solid var(--border)}
+.btn.warn{background:rgba(245,158,11,.16);border:1px solid rgba(245,158,11,.25);color:var(--ink)}
+.wrap{max-width:1200px;margin:0 auto;padding:14px 14px 40px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+@media(max-width:960px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.kpis{grid-template-columns:1fr}}
+.card{background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.head{padding:14px 14px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.head h2{margin:0;font-size:14px}
+.hint{font-size:12px;color:var(--muted)}
+.body{padding:14px}
+.kpiVal{font-size:26px;font-weight:1000}
+.kpiSub{font-size:12px;color:var(--muted);margin-top:4px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.field{display:grid;gap:7px;min-width:240px;flex:1}
+label{font-size:12px;color:var(--muted);font-weight:800}
+input,select{padding:11px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.25);color:var(--ink);font-weight:700;outline:none}
+table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+th,td{padding:10px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.08)}
+th{text-align:left;font-size:12px;color:var(--muted);background:rgba(255,255,255,.06)}
+tr:last-child td{border-bottom:0}
+.footer{margin-top:18px;text-align:center;color:rgba(248,250,252,.55);font-size:12px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.60);border:1px solid rgba(255,255,255,.12);display:none;z-index:999}
+</style></head>
+<body>
+<div class="top"><div class="bar">
+  <div><h1>SIAC — AFCON Votes Dashboard</h1><div class="sub">Cairo timezone • Powered by Luma</div></div>
+  <div class="actions">
+    <button class="btn ghost" id="btnRefresh">Sync today matches</button>
+    <button class="btn ghost" id="btnCSV">Export CSV</button>
+    <button class="btn warn" id="btnPDF">Export PDF snapshot</button>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div id="exportArea" class="grid">
+    <div class="grid kpis">
+      <div class="card"><div class="head"><h2>Total voters (today)</h2><div class="hint" id="kpiDay">—</div></div><div class="body"><div class="kpiVal" id="kpiVoters">0</div><div class="kpiSub">Today’s vote submissions.</div></div></div>
+      <div class="card"><div class="head"><h2>Correct voters (selected match)</h2><div class="hint">Needs result set</div></div><div class="body"><div class="kpiVal" id="kpiCorrect">0</div><div class="kpiSub">Picked the winning team.</div></div></div>
+      <div class="card"><div class="head"><h2>API calls today</h2><div class="hint">Tracked here</div></div><div class="body"><div class="kpiVal" id="kpiApiCalls">0</div><div class="kpiSub">Counts fixtures/leagues requests.</div></div></div>
+      <div class="card"><div class="head"><h2>Matches cached (today)</h2><div class="hint">From API</div></div><div class="body"><div class="kpiVal" id="kpiMatches">0</div><div class="kpiSub" id="kpiFetchedAt">Last fetch: —</div></div></div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1.2fr .8fr">
+      <div class="card"><div class="head"><h2>Votes by match (today)</h2><div class="hint">Live</div></div><div class="body"><canvas id="chartVotes" height="140"></canvas></div></div>
+      <div class="card"><div class="head"><h2>Settings</h2><div class="hint">Flyer URL + API setup</div></div>
+        <div class="body">
+          <div class="field"><label>Flyer image URL (optional override)</label><input id="flyerUrl" placeholder="https://…/flyer.png (optional)"/><div class="sub">Saved in RTDB so QR + Winner screen use it. Blank = embedded flyer.</div></div>
+          <div class="field" style="margin-top:10px"><label>API-Football key (local only)</label><input id="apiKey" placeholder="Paste API key"/></div>
+          <div class="row" style="margin-top:10px">
+            <div class="field"><label>AFCON League ID (auto-detect if empty)</label><input id="leagueId" placeholder="Leave blank then auto-detect"/></div>
+            <div class="field"><label>Season</label><input id="season" value="2025"/></div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn ghost" id="btnSaveSettings" type="button">Save flyer URL</button>
+            <button class="btn ghost" id="btnDetectLeague" type="button">Auto-detect league ID</button>
+          </div>
+          <div class="sub" id="detectOut" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="head">
+        <div><h2>Entries (today)</h2><div class="hint">Filter by match • set result here • pick winner in winner.html</div></div>
+        <div class="row">
+          <div class="field"><label>Filter by match</label><select id="matchFilter"><option value="">All today matches</option></select></div>
+          <div class="field"><label>Set match result (winning team)</label><select id="resultTeam"><option value="">Select a match first</option></select></div>
+          <button class="btn primary" id="btnSetResult" type="button">Save result</button>
+        </div>
+      </div>
+      <div class="body">
+        <table><thead><tr><th>Time (Cairo)</th><th>Name</th><th>Phone</th><th>Email</th><th>Match</th><th>Picked</th></tr></thead><tbody id="tbody"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Powered by Seven Apes</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script>
+// ✅ Firebase config (paste your usual "events one" config here)
+const firebaseConfig = {
+      apiKey: "AIzaSyA80bAAGPuyscnTVS-zwrxE9Jp3tPiS1gM",
+      authDomain: "events-339ce.firebaseapp.com",
+      databaseURL: "https://events-339ce-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "events-339ce",
+      storageBucket: "events-339ce.appspot.com",
+      messagingSenderId: "175601544315",
+      appId: "1:175601544315:web:00c94b4affa972b3a286de"
+};
+
+const TZ="Africa/Cairo";
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const dayKey=(function(){
+  const p=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const g=t=>p.find(x=>x.type===t)?.value;
+  return g("year")+"-"+g("month")+"-"+g("day");
+})();
+
+const PATHS={
+  settings:"afconApp/settings",
+  todayMatches:"afconApp/cache/todayMatches/"+dayKey,
+  entries:"afconApp/entries/"+dayKey,
+  results:(mid)=>"afconApp/results/"+mid,
+  apiCalls:"afconApp/metrics/apiCalls/"+dayKey
+};
+
+const els={
+  kpiDay:document.getElementById("kpiDay"),
+  kpiVoters:document.getElementById("kpiVoters"),
+  kpiCorrect:document.getElementById("kpiCorrect"),
+  kpiApiCalls:document.getElementById("kpiApiCalls"),
+  kpiMatches:document.getElementById("kpiMatches"),
+  kpiFetchedAt:document.getElementById("kpiFetchedAt"),
+  btnRefresh:document.getElementById("btnRefresh"),
+  btnCSV:document.getElementById("btnCSV"),
+  btnPDF:document.getElementById("btnPDF"),
+  exportArea:document.getElementById("exportArea"),
+  tbody:document.getElementById("tbody"),
+  matchFilter:document.getElementById("matchFilter"),
+  resultTeam:document.getElementById("resultTeam"),
+  btnSetResult:document.getElementById("btnSetResult"),
+  flyerUrl:document.getElementById("flyerUrl"),
+  apiKey:document.getElementById("apiKey"),
+  leagueId:document.getElementById("leagueId"),
+  season:document.getElementById("season"),
+  btnSaveSettings:document.getElementById("btnSaveSettings"),
+  btnDetectLeague:document.getElementById("btnDetectLeague"),
+  detectOut:document.getElementById("detectOut"),
+  toast:document.getElementById("toast")
+};
+
+let todayMatches=[]; let entries=[]; let chart=null;
+
+function toast(msg){els.toast.textContent=msg;els.toast.style.display="block";clearTimeout(window.__t);window.__t=setTimeout(()=>els.toast.style.display="none",2200);}
+function fmtCairoTime(ms){return new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit"}).format(new Date(ms));}
+function safe(s){return (s??"").toString();}
+
+function incApiCalls(n=1){db.ref(PATHS.apiCalls).transaction(v=>(v||0)+n);}
+db.ref(PATHS.apiCalls).on("value",s=>els.kpiApiCalls.textContent=s.exists()?s.val():0);
+
+async function loadSettings() {
+  const s=await db.ref(PATHS.settings).get();
+  const v=s.exists()?s.val():{};
+  els.flyerUrl.value=v.flyerUrl||"";
+  els.apiKey.value=localStorage.getItem("afcon_api_key")||"";
+  els.leagueId.value=localStorage.getItem("afcon_league_id")||"";
+  els.season.value=localStorage.getItem("afcon_season")||"2025";
+}
+
+els.btnSaveSettings.onclick=async ()=>{await db.ref(PATHS.settings).update({flyerUrl: els.flyerUrl.value.trim()||null});toast("Saved flyer URL");};
+
+const API_BASE="https://v3.football.api-sports.io";
+async function apiFetch(path){
+  const key=(localStorage.getItem("afcon_api_key")||"").trim();
+  if(!key) throw new Error("missing key");
+  const res=await fetch(API_BASE+path,{headers:{"x-apisports-key":key}});
+  incApiCalls(1);
+  if(!res.ok) throw new Error("api error "+res.status);
+  return res.json();
+}
+
+els.btnDetectLeague.onclick=async ()=>{
+  try{
+    localStorage.setItem("afcon_api_key", els.apiKey.value.trim());
+    const data=await apiFetch("/leagues?search="+encodeURIComponent("Africa Cup of Nations"));
+    const list=(data.response||[]).map(r=>r.league?{id:r.league.id,name:r.league.name,country:r.country?.name||"—"}:null).filter(Boolean);
+    if(!list.length) return els.detectOut.textContent="No leagues found.";
+    els.detectOut.innerHTML=list.slice(0,12).map(x=>"• ID "+x.id+" — "+x.name+" ("+x.country+")").join("<br>")+"<div style='margin-top:8px' class='sub'>Paste the correct ID into League ID.</div>";
+    toast("League list loaded");
+  }catch(e){console.error(e);toast("Auto-detect failed");}
+};
+
+els.btnRefresh.onclick=async ()=>{
+  try{
+    localStorage.setItem("afcon_api_key", els.apiKey.value.trim());
+    const leagueId=(els.leagueId.value.trim()||localStorage.getItem("afcon_league_id")||"").trim();
+    const season=(els.season.value.trim()||"2025").trim();
+    if(!leagueId) return toast("League ID needed");
+    localStorage.setItem("afcon_league_id", leagueId);
+    localStorage.setItem("afcon_season", season);
+    toast("Syncing…");
+    const data=await apiFetch("/fixtures?date="+dayKey+"&league="+encodeURIComponent(leagueId)+"&season="+encodeURIComponent(season)+"&timezone="+encodeURIComponent(TZ));
+    const resp=data.response||[];
+    const matches=resp.map(f=>({
+      matchId:String(f.fixture?.id||""),
+      home:f.teams?.home?.name||"Home",
+      away:f.teams?.away?.name||"Away",
+      kickoffISO:f.fixture?.date
+    })).filter(m=>m.matchId&&m.kickoffISO);
+    await db.ref(PATHS.todayMatches).set({fetchedAt: firebase.database.ServerValue.TIMESTAMP, matches});
+    toast("Cached "+matches.length+" matches");
+  }catch(e){console.error(e);toast("Sync failed");}
+};
+
+db.ref(PATHS.todayMatches).on("value",snap=>{
+  if(!snap.exists()){todayMatches=[];els.kpiMatches.textContent=0;els.kpiFetchedAt.textContent="Last fetch: —";renderFilters();renderChart();return;}
+  const v=snap.val();
+  todayMatches=Array.isArray(v.matches)?v.matches:[];
+  todayMatches.sort((a,b)=>new Date(a.kickoffISO)-new Date(b.kickoffISO));
+  els.kpiMatches.textContent=todayMatches.length;
+  els.kpiFetchedAt.textContent="Last fetch: "+(v.fetchedAt?fmtCairoTime(v.fetchedAt):"—");
+  renderFilters();renderChart();
+});
+
+db.ref(PATHS.entries).on("value",snap=>{
+  entries=[];
+  if(snap.exists()) snap.forEach(ch=>entries.push({id:ch.key,...ch.val()}));
+  entries.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  els.kpiVoters.textContent=entries.length;
+  renderTable();renderChart();updateCorrect();
+});
+
+function renderFilters(){
+  const cur=els.matchFilter.value;
+  els.matchFilter.innerHTML="<option value=''>All today matches</option>";
+  todayMatches.forEach(m=>{
+    const opt=document.createElement("option");
+    opt.value=m.matchId;
+    opt.textContent=m.home+" vs "+m.away+" — "+new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit"}).format(new Date(m.kickoffISO));
+    els.matchFilter.appendChild(opt);
+  });
+  if(cur) els.matchFilter.value=cur;
+  renderResultTeams();
+}
+
+els.matchFilter.onchange=()=>{renderResultTeams();renderTable();updateCorrect();};
+
+function renderResultTeams(){
+  const mid=els.matchFilter.value;
+  const m=todayMatches.find(x=>x.matchId==mid);
+  els.resultTeam.innerHTML="";
+  if(!m){els.resultTeam.innerHTML="<option value=''>Select a match first</option>";return;}
+  els.resultTeam.appendChild(new Option("Select winning team…",""));
+  [m.home,m.away].forEach(t=>els.resultTeam.appendChild(new Option(t,t)));
+  db.ref(PATHS.results(mid)).get().then(s=>{ if(s.exists()&&s.val()?.winnerTeam) els.resultTeam.value=s.val().winnerTeam; updateCorrect(); });
+}
+
+function filteredEntries(){
+  const mid=els.matchFilter.value;
+  return mid?entries.filter(e=>e.matchId==mid):entries;
+}
+
+function renderTable(){
+  const list=filteredEntries();
+  els.tbody.innerHTML="";
+  if(!list.length){els.tbody.innerHTML="<tr><td colspan='6' class='sub'>No entries yet.</td></tr>";return;}
+  list.slice(0,400).forEach(e=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML="<td>"+(e.createdAt?fmtCairoTime(e.createdAt):"—")+"</td><td>"+safe(e.fullName)+"</td><td>"+safe(e.phone)+"</td><td>"+safe(e.email||"")+"</td><td>"+safe(e.matchLabel)+"</td><td>"+safe(e.pickedTeam)+"</td>";
+    els.tbody.appendChild(tr);
+  });
+}
+
+async function updateCorrect(){
+  const mid=els.matchFilter.value;
+  if(!mid){els.kpiCorrect.textContent=0;return;}
+  const rs=await db.ref(PATHS.results(mid)).get();
+  const wt=rs.exists()?rs.val()?.winnerTeam:null;
+  if(!wt){els.kpiCorrect.textContent=0;return;}
+  els.kpiCorrect.textContent=entries.filter(e=>e.matchId==mid&&e.pickedTeam==wt).length;
+}
+
+els.btnSetResult.onclick=async ()=>{
+  const mid=els.matchFilter.value;
+  const wt=els.resultTeam.value;
+  if(!mid) return toast("Select match");
+  if(!wt) return toast("Select winner");
+  await db.ref(PATHS.results(mid)).set({winnerTeam:wt,setAt: firebase.database.ServerValue.TIMESTAMP});
+  toast("Result saved"); updateCorrect();
+};
+
+function renderChart(){
+  const labels=todayMatches.map(m=>m.home+" vs "+m.away);
+  const counts=todayMatches.map(m=>entries.filter(e=>e.matchId==m.matchId).length);
+  const ctx=document.getElementById("chartVotes");
+  if(!chart){
+    chart=new Chart(ctx,{type:"bar",data:{labels,datasets:[{label:"Votes",data:counts}]},options:{plugins:{legend:{display:false}}}});
+  } else {
+    chart.data.labels=labels; chart.data.datasets[0].data=counts; chart.update();
+  }
+}
+
+els.btnCSV.onclick=()=>{
+  const list=filteredEntries();
+  const rows=[["createdAt(Cairo)","fullName","phone","email","matchId","matchLabel","kickoffISO","pickedTeam"],...list.map(e=>[e.createdAt?fmtCairoTime(e.createdAt):"",safe(e.fullName),safe(e.phone),safe(e.email||""),safe(e.matchId),safe(e.matchLabel),safe(e.kickoffISO),safe(e.pickedTeam)])];
+  const csv=rows.map(r=>r.map(v=>"\""+String(v).replaceAll("\"","\"\"")+"\"").join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="afcon_votes_"+dayKey+".csv"; a.click(); URL.revokeObjectURL(a.href);
+};
+
+els.btnPDF.onclick=async ()=>{
+  toast("Preparing PDF…");
+  const canvas=await html2canvas(els.exportArea,{backgroundColor:null,scale: window.devicePixelRatio>1?2:1});
+  const img=canvas.toDataURL("image/png");
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:"p",unit:"pt",format:"a4"});
+  const pageW=pdf.internal.pageSize.getWidth(), pageH=pdf.internal.pageSize.getHeight();
+  const imgW=pageW, imgH=canvas.height*(imgW/canvas.width);
+  let remaining=imgH, offset=0;
+  while(remaining>0){pdf.addImage(img,"PNG",0,-offset,imgW,imgH); remaining-=pageH; offset+=pageH; if(remaining>0) pdf.addPage();}
+  pdf.save("afcon_dashboard_"+dayKey+".pdf");
+  toast("PDF exported");
+};
+
+(async function init(){els.kpiDay.textContent=dayKey+" (Cairo)";await loadSettings();toast("Dashboard ready");})();
+</script>
+</body>
+</html>
