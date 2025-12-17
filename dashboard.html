@@ -47,7 +47,7 @@ tr:last-child td{border-bottom:0}
 <div class="top"><div class="bar">
   <div><h1>SIAC — AFCON Votes Dashboard</h1><div class="sub">Cairo timezone • Powered by Luma</div></div>
   <div class="actions">
-    <button class="btn ghost" id="btnRefresh">Sync today matches</button>
+    <button class="btn ghost" id="btnRefresh">Sync ALL AFCON matches (season)</button>
     <button class="btn ghost" id="btnCSV">Export CSV</button>
     <button class="btn warn" id="btnPDF">Export PDF snapshot</button>
   </div>
@@ -96,7 +96,7 @@ tr:last-child td{border-bottom:0}
     </div>
   </div>
 
-  <div class="footer">Powered by Seven Apes</div>
+  <div class="footer">Powered by Luma</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -127,7 +127,9 @@ const dayKey=(function(){
 const PATHS={
   settings:"afconApp/settings",
   todayMatches:"afconApp/cache/todayMatches/"+dayKey,
+  matchesByDate:(d)=>"afconApp/cache/matchesByDate/"+d,
   entries:"afconApp/entries/"+dayKey,
+  entriesByDate:(d)=>"afconApp/entries/"+d,
   results:(mid)=>"afconApp/results/"+mid,
   apiCalls:"afconApp/metrics/apiCalls/"+dayKey
 };
@@ -206,8 +208,9 @@ els.btnRefresh.onclick=async ()=>{
     if(!leagueId) return toast("League ID needed");
     localStorage.setItem("afcon_league_id", leagueId);
     localStorage.setItem("afcon_season", season);
-    toast("Syncing…");
-    const data=await apiFetch("/fixtures?date="+dayKey+"&league="+encodeURIComponent(leagueId)+"&season="+encodeURIComponent(season)+"&timezone="+encodeURIComponent(TZ));
+    toast("Syncing full season…");
+    // Fetch ALL fixtures for the league/season, then cache grouped by Cairo date.
+    const data=await apiFetch("/fixtures?league="+encodeURIComponent(leagueId)+"&season="+encodeURIComponent(season)+"&timezone="+encodeURIComponent(TZ));
     const resp=data.response||[];
     const matches=resp.map(f=>({
       matchId:String(f.fixture?.id||""),
@@ -215,8 +218,32 @@ els.btnRefresh.onclick=async ()=>{
       away:f.teams?.away?.name||"Away",
       kickoffISO:f.fixture?.date
     })).filter(m=>m.matchId&&m.kickoffISO);
-    await db.ref(PATHS.todayMatches).set({fetchedAt: firebase.database.ServerValue.TIMESTAMP, matches});
-    toast("Cached "+matches.length+" matches");
+
+    // Group by Cairo dayKey
+    const fmt=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"});
+    const byDay=new Map();
+    for(const m of matches){
+      const dk=fmt.format(new Date(m.kickoffISO)); // YYYY-MM-DD
+      if(!byDay.has(dk)) byDay.set(dk,[]);
+      byDay.get(dk).push(m);
+    }
+    // Sort each day by kickoff
+    for(const [dk,arr] of byDay.entries()){
+      arr.sort((a,b)=> new Date(a.kickoffISO)-new Date(b.kickoffISO));
+    }
+
+    // Multi-location update: store per-day cache + also update today's cache for the public form
+    const updates={};
+    const fetchedAt=firebase.database.ServerValue.TIMESTAMP;
+    for(const [dk,arr] of byDay.entries()){
+      updates[PATHS.matchesByDate(dk)]={fetchedAt, matches:arr};
+    }
+    // Always set today's cache, even if empty, so public page has a stable node
+    const todayArr=byDay.get(dayKey)||[];
+    updates[PATHS.todayMatches]={fetchedAt, matches:todayArr};
+
+    await db.ref().update(updates);
+    toast("Cached "+matches.length+" matches across "+byDay.size+" days (today: "+todayArr.length+")");
   }catch(e){console.error(e);toast("Sync failed");}
 };
 
