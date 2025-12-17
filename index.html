@@ -214,7 +214,14 @@ function nowMs() { return Date.now(); }
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const btnVote = document.getElementById("btnVote");
+const btnVote = document.getElementById("openBtn");
+if (btnVote) {
+  btnVote.addEventListener("click", () => {
+    const wrap = document.getElementById("wrap");
+    const form = document.getElementById("formScreen");
+    if (wrap && form) wrap.scrollTo({ top: form.offsetTop, behavior: "smooth" });
+  });
+}
 const matchSel = document.getElementById("matchSel");
 const teamSel  = document.getElementById("teamSel");
 const dateSel  = document.getElementById("dateSel");
@@ -437,6 +444,7 @@ document.getElementById("voteForm").addEventListener("submit", async (e) => {
 </script>
 </body>
 </html>
+
 
 
 
