@@ -1,321 +1,264 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <title>AFCON Nights — Owner Dashboard</title>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0b1020;
-      --panel:#0f1730;
-      --panel2:#121d3a;
-      --ink:#eef2ff;
-      --muted:#a7b0d6;
-      --border:rgba(255,255,255,.10);
-      --accent:#7c3aed;
-      --accent2:#22c55e;
-      --danger:#ef4444;
-      --warn:#f59e0b;
-      --radius:18px;
-      --shadow:0 22px 60px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:
-      radial-gradient(1200px 700px at 10% -10%, rgba(124,58,237,.35), transparent 60%),
-      radial-gradient(900px 600px at 110% 10%, rgba(34,197,94,.25), transparent 55%),
-      radial-gradient(900px 700px at 50% 120%, rgba(59,130,246,.18), transparent 55%),
-      var(--bg);
-      color:var(--ink);
-      min-height:100vh;
-    }
-    a{color:inherit}
-    .wrap{max-width:1100px;margin:0 auto;padding:24px}
-    @media(max-width:640px){.wrap{padding:16px}}
-    .topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap}
-    .brand{display:flex;gap:10px;align-items:center;min-width:240px}
-    .dot{width:12px;height:12px;border-radius:999px;background:linear-gradient(135deg,var(--accent),#60a5fa)}
-    h1{font-size:18px;margin:0}
-    .sub{color:var(--muted);font-size:12px;margin-top:2px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .grid{display:grid;gap:14px}
-    .grid2{display:grid;grid-template-columns:1.4fr .9fr;gap:14px}
-    @media (max-width:900px){.grid2{grid-template-columns:1fr}}
-    .pad{padding:16px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--ink);
-      padding:10px 12px;border-radius:14px;cursor:pointer;font-weight:800}
-    .btn:hover{background:rgba(255,255,255,.09)}
-    .btn.primary{background:linear-gradient(135deg,var(--accent),#3b82f6);border-color:transparent}
-    .btn.good{background:linear-gradient(135deg,#16a34a,#22c55e);border-color:transparent}
-    .btn.danger{background:linear-gradient(135deg,#ef4444,#f97316);border-color:transparent}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
-    .inp,.sel,textarea{background:rgba(0,0,0,.18);border:1px solid var(--border);color:var(--ink);
-      padding:10px 12px;border-radius:14px;outline:none;min-width:220px}
-    @media(max-width:520px){.inp,.sel{min-width:unset;width:100%}}
-    textarea{min-width:unset;width:100%;min-height:92px;resize:vertical}
-    label{font-size:12px;color:var(--muted)}
-    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-    @media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    .kpi{padding:14px;border-radius:16px;border:1px solid var(--border);background:rgba(255,255,255,.04)}
-    .kpi .v{font-size:20px;font-weight:900}
-    .kpi .t{font-size:12px;color:var(--muted);margin-top:2px}
-    .tbl{width:100%;border-collapse:separate;border-spacing:0 10px}
-    .tbl th{font-size:11px;color:var(--muted);text-align:left;padding:0 10px}
-    .tbl td{padding:12px 10px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
-    .tbl tr td:first-child{border-radius:14px 0 0 14px}
-    .tbl tr td:last-child{border-radius:0 14px 14px 0}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;
-      border:1px solid var(--border);background:rgba(0,0,0,.18);font-size:12px;color:var(--muted)}
-    .chip.open{color:#bbf7d0;border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.12)}
-    .chip.closed{color:#fecaca;border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.12)}
-    .muted{color:var(--muted)}
-    .footer{margin-top:18px;text-align:center;color:rgba(255,255,255,.6);font-size:12px}
-    .hr{height:1px;background:var(--border);margin:12px 0}
-    .sectionTitle{font-weight:900;margin-bottom:8px}
-    .hint{font-size:12px;color:var(--muted);line-height:1.5}
-
-    /* Mobile: entries as cards */
-    .entriesCards{display:none;gap:10px}
-    .entryCard{border:1px solid var(--border);background:rgba(255,255,255,.04);border-radius:16px;padding:12px}
-    .entryCard .name{font-weight:900}
-    .entryCard .meta{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.45}
-    @media(max-width:720px){
-      .entriesTableWrap{display:none}
-      .entriesCards{display:grid}
-    }
-
-    /* Modal */
-    .modalBack{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:999}
-    .modal{width:min(560px,92vw);background:linear-gradient(180deg, rgba(18,29,58,.98), rgba(15,23,48,.98));
-      border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
-    .modalHead{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
-    .modalHead b{font-weight:900}
-    .modalBody{padding:16px;display:grid;gap:12px}
-    .modalActions{padding:14px 16px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
-    .xbtn{background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--ink);border-radius:12px;padding:8px 10px;cursor:pointer;font-weight:900}
-    .gridForm2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:640px){.gridForm2{grid-template-columns:1fr}}
-  </style>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>SIAC — AFCON Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0b0f1a;--panel:rgba(255,255,255,.08);--ink:#f8fafc;--muted:rgba(248,250,252,.72);
+  --border:rgba(255,255,255,.12);--accent:#22c55e;--warn:#f59e0b;--danger:#ef4444;
+  --radius:18px;--shadow:0 18px 50px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--ink);
+  background:radial-gradient(1200px 800px at 15% -10%, rgba(96,165,250,.18), transparent 60%),
+  radial-gradient(1200px 800px at 110% 10%, rgba(34,197,94,.14), transparent 55%), var(--bg);}
+.top{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);background:rgba(11,15,26,.65);border-bottom:1px solid var(--border);}
+.bar{max-width:1200px;margin:0 auto;padding:14px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:16px}
+.sub{font-size:12px;color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{appearance:none;border:0;cursor:pointer;padding:10px 12px;border-radius:14px;font-weight:900}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#16a34a);color:#06120b}
+.btn.ghost{background:rgba(255,255,255,.10);color:var(--ink);border:1px solid var(--border)}
+.btn.warn{background:rgba(245,158,11,.16);border:1px solid rgba(245,158,11,.25);color:var(--ink)}
+.btn.danger{background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.25);color:var(--ink)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.wrap{max-width:1200px;margin:0 auto;padding:14px 14px 40px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+@media(max-width:960px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.kpis{grid-template-columns:1fr}}
+.card{background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.head{padding:14px 14px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.head h2{margin:0;font-size:14px}
+.hint{font-size:12px;color:var(--muted)}
+.body{padding:14px}
+.kpiVal{font-size:26px;font-weight:1000}
+.kpiSub{font-size:12px;color:var(--muted);margin-top:4px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.field{display:grid;gap:7px;min-width:220px;flex:1}
+label{font-size:12px;color:var(--muted);font-weight:800}
+input,select{padding:11px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.25);color:var(--ink);font-weight:700;outline:none}
+.small{font-size:12px;color:var(--muted)}
+.tableWrap{border:1px solid var(--border);border-radius:14px;overflow:auto;max-height:520px}
+table{width:100%;border-collapse:separate;border-spacing:0}
+th,td{padding:10px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:middle;white-space:nowrap}
+th{text-align:left;font-size:12px;color:var(--muted);background:rgba(255,255,255,.06);position:sticky;top:0;z-index:1}
+tr:last-child td{border-bottom:0}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);
+  background:rgba(0,0,0,.18);font-size:12px;color:var(--muted)}
+.badge.ok{color:#bbf7d0;border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.12)}
+.badge.no{color:#fecaca;border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.12)}
+.footer{margin-top:18px;text-align:center;color:rgba(248,250,252,.55);font-size:12px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);padding:10px 12px;border-radius:14px;
+  background:rgba(0,0,0,.60);border:1px solid rgba(255,255,255,.12);display:none;z-index:999;max-width:min(92vw,720px)}
+.modalBack{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:14px}
+.modal{width:min(680px,96vw);background:rgba(255,255,255,.10);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);backdrop-filter:blur(14px);overflow:hidden}
+.modal .mh{padding:14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.modal .mh b{font-size:14px}
+.modal .mb{padding:14px;display:grid;gap:12px}
+.modal .mf{padding:12px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.hr{height:1px;background:var(--border);margin:10px 0}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="brand">
-        <div class="dot"></div>
+<div class="top">
+  <div class="bar">
+    <div>
+      <h1>SIAC — AFCON Votes Dashboard</h1>
+      <div class="sub">Cairo timezone • Powered by Luma</div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="btnRefresh">Refresh</button>
+      <button class="btn ghost" id="btnCSV">Export CSV</button>
+      <button class="btn warn" id="btnPDF">Export PDF snapshot</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="exportArea" class="grid">
+
+    <div class="grid kpis">
+      <div class="card">
+        <div class="head"><h2>Total voters</h2><div class="hint" id="kpiDay">—</div></div>
+        <div class="body"><div class="kpiVal" id="kpiVoters">0</div><div class="kpiSub">All votes submitted.</div></div>
+      </div>
+      <div class="card">
+        <div class="head"><h2>Today voters</h2><div class="hint">Cairo</div></div>
+        <div class="body"><div class="kpiVal" id="kpiToday">0</div><div class="kpiSub">Votes submitted today.</div></div>
+      </div>
+      <div class="card">
+        <div class="head"><h2>Matches</h2><div class="hint">Stored in RTDB</div></div>
+        <div class="body"><div class="kpiVal" id="kpiMatches">0</div><div class="kpiSub" id="kpiMatchesHint">Total matches loaded.</div></div>
+      </div>
+      <div class="card">
+        <div class="head"><h2>Results set</h2><div class="hint">Winners</div></div>
+        <div class="body"><div class="kpiVal" id="kpiResults">0</div><div class="kpiSub">Matches that already have a winner.</div></div>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1.2fr .8fr">
+      <div class="card">
+        <div class="head"><h2>Votes by hour (today)</h2><div class="hint">Live</div></div>
+        <div class="body"><canvas id="chartVotes" height="140"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="head"><h2>Settings</h2><div class="hint">Flyer URL</div></div>
+        <div class="body">
+          <div class="field">
+            <label>Flyer image URL (optional override)</label>
+            <input id="flyerUrl" placeholder="https://…/flyer.png (optional)"/>
+            <div class="small">Saved in RTDB so the voting page uses it. Blank = use the embedded flyer.</div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn ghost" id="btnSaveFlyer" type="button">Save flyer</button>
+            <button class="btn ghost" id="btnOpenWinner" type="button">Open winner screen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="head">
         <div>
-          <h1>AFCON Nights — Owner Dashboard</h1>
-          <div class="sub">Cairo timezone • RTDB</div>
+          <h2>Matches</h2>
+          <div class="hint">Scrollable table • Add / Edit / Delete • Set winner</div>
+        </div>
+        <div class="row">
+          <div class="field" style="min-width:220px;flex:0">
+            <label>Filter day</label>
+            <input id="dayFilter" type="date"/>
+          </div>
+          <div class="field" style="min-width:220px;flex:0">
+            <label>Show</label>
+            <select id="winnerFilter">
+              <option value="all">All matches</option>
+              <option value="noWinner">Only matches without winner</option>
+              <option value="hasWinner">Only matches with winner</option>
+            </select>
+          </div>
+          <button class="btn primary" id="btnAddMatch" type="button">Add match</button>
+        </div>
+      </div>
+      <div class="body">
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="min-width:120px">Day</th>
+                <th style="min-width:90px">Time</th>
+                <th>Match</th>
+                <th style="min-width:170px">Winner</th>
+                <th style="min-width:280px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="matchesTbody"></tbody>
+          </table>
+        </div>
+        <div class="small" style="margin-top:10px">Tip: Set winners from “Only matches without winner” to make it faster.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="head">
+        <div><h2>Entries</h2><div class="hint">Filter by day + match</div></div>
+        <div class="row">
+          <div class="field" style="min-width:220px;flex:0">
+            <label>Day</label>
+            <input id="entriesDay" type="date"/>
+          </div>
+          <div class="field" style="min-width:260px;flex:0">
+            <label>Match</label>
+            <select id="entriesMatch"><option value="">All matches</option></select>
+          </div>
+          <button class="btn ghost" id="btnEntriesRefresh" type="button">Refresh entries</button>
+        </div>
+      </div>
+      <div class="body">
+        <div class="tableWrap" style="max-height:420px">
+          <table>
+            <thead>
+              <tr>
+                <th style="min-width:110px">Time</th>
+                <th style="min-width:180px">Name</th>
+                <th style="min-width:140px">Phone</th>
+                <th style="min-width:220px">Email</th>
+                <th style="min-width:260px">Match</th>
+                <th style="min-width:140px">Picked</th>
+              </tr>
+            </thead>
+            <tbody id="entriesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">Powered by Luma</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Match Modal -->
+<div class="modalBack" id="matchModalBack" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="mh">
+      <div>
+        <b id="mmTitle">Add match</b>
+        <div class="small" id="mmSub">Cairo timezone</div>
+      </div>
+      <button class="btn ghost" id="mmClose" type="button">Close</button>
+    </div>
+    <div class="mb">
+      <div class="row">
+        <div class="field">
+          <label>Home team</label>
+          <input id="mmHome" placeholder="e.g., Egypt"/>
+        </div>
+        <div class="field">
+          <label>Away team</label>
+          <input id="mmAway" placeholder="e.g., Nigeria"/>
         </div>
       </div>
       <div class="row">
-        <button class="btn" id="pdfBtn">Export PDF</button>
-        <button class="btn" id="csvBtn">Export CSV</button>
+        <div class="field">
+          <label>Kickoff (Cairo)</label>
+          <input id="mmKickoff" type="datetime-local"/>
+          <div class="small">We store kickoff as ISO with +02:00 / Cairo offset based on your input.</div>
+        </div>
+        <div class="field" style="flex:0;min-width:220px">
+          <label>Match ID (optional)</label>
+          <input id="mmId" placeholder="Leave empty to auto-generate"/>
+          <div class="small">If you already have IDs, paste them here.</div>
+        </div>
       </div>
+      <div class="hr"></div>
+      <div class="small" id="mmPreview">—</div>
     </div>
-
-    <div class="grid2">
-      <div class="card pad" id="exportArea">
-        <div class="kpis">
-          <div class="kpi"><div class="v" id="kTotal">0</div><div class="t">Total voters</div></div>
-          <div class="kpi"><div class="v" id="kToday">0</div><div class="t">Today voters</div></div>
-          <div class="kpi"><div class="v" id="kCorrect">0</div><div class="t">Correct picks (selected match)</div></div>
-          <div class="kpi"><div class="v" id="kUnresolved">0</div><div class="t">Unresolved matches</div></div>
-        </div>
-        <div class="hr"></div>
-
-        <div class="row" style="justify-content:space-between;align-items:flex-end">
-          <div>
-            <div class="sectionTitle">Matches & winners</div>
-            <div class="hint">Filter by day, manage matches, then set winners for unresolved matches.</div>
-          </div>
-          <div class="row" style="justify-content:flex-end">
-            <div style="display:grid;gap:6px">
-              <label>Day</label>
-              <input class="inp" id="dayPick" type="date"/>
-            </div>
-            <button class="btn" id="loadDayBtn">Load</button>
-            <button class="btn" id="loadAllBtn">All days</button>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px;align-items:flex-end">
-          <div style="display:grid;gap:6px;flex:1;min-width:260px">
-            <label>Flyer image URL (used by voting & winner screen)</label>
-            <input class="inp" id="flyerUrl" placeholder="https://.../flyer.jpg or firebase storage url"/>
-          </div>
-          <button class="btn primary" id="saveFlyerBtn">Save</button>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="row" style="gap:10px">
-          <div class="chip" id="dayChip">Day: —</div>
-          <div class="chip" id="matchChip">Match: —</div>
-          <div class="chip" id="statusChip">Status: —</div>
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <select class="sel" id="unresolvedToggle" style="min-width:240px">
-            <option value="unresolved">Unresolved matches only</option>
-            <option value="all">All matches</option>
-          </select>
-          <select class="sel" id="matchSel" style="min-width:360px"></select>
-          <select class="sel" id="winnerTeamSel" style="min-width:240px" disabled></select>
-          <button class="btn good" id="setResultBtn" disabled>Set winner</button>
-          <button class="btn" id="openWinnerBtn">Open winner screen</button>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="card pad">
-          <div class="sectionTitle">Manage matches</div>
-          <div class="hint">Add, edit, or delete matches. Matches are saved in RTDB under the selected day.</div>
-          <div class="hr"></div>
-
-          <div class="gridForm2">
-            <div class="row" style="display:grid;gap:6px">
-              <label>Home team</label>
-              <input class="inp" id="addHome" placeholder="e.g., Egypt"/>
-            </div>
-            <div class="row" style="display:grid;gap:6px">
-              <label>Away team</label>
-              <input class="inp" id="addAway" placeholder="e.g., Nigeria"/>
-            </div>
-          </div>
-
-          <div class="gridForm2">
-            <div class="row" style="display:grid;gap:6px">
-              <label>Kickoff (Cairo)</label>
-              <input class="inp" id="addKickoff" type="datetime-local"/>
-            </div>
-            <div class="row" style="display:grid;gap:6px">
-              <label>Day (auto)</label>
-              <input class="inp" id="addDay" type="date" disabled/>
-            </div>
-          </div>
-
-          <div class="row" style="justify-content:flex-end">
-            <button class="btn primary" id="addMatchBtn">Add match</button>
-            <button class="btn" id="editMatchBtn" disabled>Edit selected</button>
-            <button class="btn danger" id="deleteMatchBtn" disabled>Delete selected</button>
-          </div>
-
-          <div class="hint" id="matchCountHint" style="margin-top:10px"></div>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="grid" style="gap:12px">
-          <div class="card pad">
-            <div class="sectionTitle">Votes over time (today)</div>
-            <canvas id="chart" height="120"></canvas>
-          </div>
-
-          <div class="card pad">
-            <div class="row" style="justify-content:space-between;align-items:flex-end">
-              <div>
-                <div class="sectionTitle">Entries</div>
-                <div class="hint">Filter voters and export CSV/PDF.</div>
-              </div>
-              <div class="row">
-                <select class="sel" id="filterMode" style="min-width:220px">
-                  <option value="all">All</option>
-                  <option value="today">Today only</option>
-                  <option value="selectedMatch">Selected match only</option>
-                  <option value="correctOnly">Correct only (selected match)</option>
-                </select>
-                <button class="btn" id="refreshBtn">Refresh</button>
-              </div>
-            </div>
-
-            <div class="entriesTableWrap" style="overflow:auto;margin-top:10px">
-              <table class="tbl" id="tbl">
-                <thead>
-                  <tr>
-                    <th>Name</th><th>Phone</th><th>Email</th><th>Match</th><th>Pick</th><th>Time</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-
-            <div class="entriesCards" id="entriesCards" style="margin-top:10px"></div>
-          </div>
-
-          <pre class="card pad" id="log" style="margin-top:12px;white-space:pre-wrap;max-height:220px;overflow:auto"></pre>
-        </div>
-      </div>
-
-      <div class="card pad">
-        <div class="sectionTitle">Quick checklist</div>
-        <div class="hint" style="margin-top:6px;line-height:1.6">
-          • Set the flyer URL (optional).<br/>
-          • Add matches manually (or edit/delete).<br/>
-          • Select unresolved match → set winner.<br/>
-          • Winner screen draws from correct picks only (after winner set).<br/>
-        </div>
-        <div class="hr"></div>
-        <div class="sectionTitle">Data paths</div>
-        <div class="hint" style="margin-top:6px;line-height:1.6">
-          afconApp/config/flyerUrl<br/>
-          afconApp/cache/matchesByDate/YYYY-MM-DD/matches[]<br/>
-          afconApp/entries/*<br/>
-          afconApp/results/matchId = winnerTeam<br/>
-        </div>
-        <div class="footer">Powered by Luma</div>
-      </div>
+    <div class="mf">
+      <button class="btn danger" id="mmDelete" type="button" style="display:none">Delete</button>
+      <button class="btn ghost" id="mmCancel" type="button">Cancel</button>
+      <button class="btn primary" id="mmSave" type="button">Save</button>
     </div>
   </div>
+</div>
 
-  <!-- Edit Modal -->
-  <div class="modalBack" id="modalBack">
-    <div class="modal" role="dialog" aria-modal="true">
-      <div class="modalHead">
-        <b id="modalTitle">Edit match</b>
-        <button class="xbtn" id="modalClose">✕</button>
-      </div>
-      <div class="modalBody">
-        <div class="gridForm2">
-          <div style="display:grid;gap:6px">
-            <label>Home team</label>
-            <input class="inp" id="mHome"/>
-          </div>
-          <div style="display:grid;gap:6px">
-            <label>Away team</label>
-            <input class="inp" id="mAway"/>
-          </div>
-        </div>
-        <div class="gridForm2">
-          <div style="display:grid;gap:6px">
-            <label>Kickoff (Cairo)</label>
-            <input class="inp" id="mKick" type="datetime-local"/>
-          </div>
-          <div style="display:grid;gap:6px">
-            <label>Match ID</label>
-            <input class="inp" id="mId" disabled/>
-          </div>
-        </div>
-        <div class="hint">Editing updates the match in its day list.</div>
-      </div>
-      <div class="modalActions">
-        <button class="btn" id="modalCancel">Cancel</button>
-        <button class="btn primary" id="modalSave">Save changes</button>
-      </div>
-    </div>
-  </div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script>
+/* =========================
+   Firebase (same config you used)
+   ========================= */
 const firebaseConfig = {
   apiKey: "AIzaSyA80bAAGPuyscnTVS-zwrxE9Jp3tPiS1gM",
   authDomain: "events-339ce.firebaseapp.com",
@@ -325,517 +268,576 @@ const firebaseConfig = {
   messagingSenderId: "175601544315",
   appId: "1:175601544315:web:00c94b4affa972b3a286de"
 };
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const APP_PATH = "afconApp";
+
 const TZ = "Africa/Cairo";
-const VOTE_WINDOW_MS = (2*60+3)*60*1000;
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-const logEl = document.getElementById("log");
-const log = (s) => { logEl.textContent = (new Date().toLocaleString() + "  " + s + "\\n") + logEl.textContent; };
+const PATHS = {
+  flyerUrl: "afconApp/config/flyerUrl",
+  matchesByDate: (dayKey)=> `afconApp/cache/matchesByDate/${dayKey}/matches`,
+  matchesMeta:  (dayKey)=> `afconApp/cache/matchesByDate/${dayKey}/fetchedAt`,
+  entries: "afconApp/entries",
+  results: "afconApp/results"
+};
 
-const todayKeyCairo = () => new Intl.DateTimeFormat('en-CA', {timeZone:TZ, year:'numeric', month:'2-digit', day:'2-digit'}).format(new Date());
-const fmtTime = (iso) => new Intl.DateTimeFormat('en-US', {timeZone:TZ, hour:'2-digit', minute:'2-digit'}).format(new Date(iso));
-const fmtDate = (iso) => new Intl.DateTimeFormat('en-CA', {timeZone:TZ, year:'numeric', month:'2-digit', day:'2-digit'}).format(new Date(iso));
+const els = {
+  toast: document.getElementById("toast"),
+  exportArea: document.getElementById("exportArea"),
+  btnRefresh: document.getElementById("btnRefresh"),
+  btnCSV: document.getElementById("btnCSV"),
+  btnPDF: document.getElementById("btnPDF"),
 
-function cutoffMs(iso){ return new Date(iso).getTime() + VOTE_WINDOW_MS; }
+  kpiDay: document.getElementById("kpiDay"),
+  kpiVoters: document.getElementById("kpiVoters"),
+  kpiToday: document.getElementById("kpiToday"),
+  kpiMatches: document.getElementById("kpiMatches"),
+  kpiMatchesHint: document.getElementById("kpiMatchesHint"),
+  kpiResults: document.getElementById("kpiResults"),
 
-function makeId(){
-  return "M_" + Math.random().toString(16).slice(2,8).toUpperCase() + "_" + Date.now().toString(36).toUpperCase();
+  flyerUrl: document.getElementById("flyerUrl"),
+  btnSaveFlyer: document.getElementById("btnSaveFlyer"),
+  btnOpenWinner: document.getElementById("btnOpenWinner"),
+
+  dayFilter: document.getElementById("dayFilter"),
+  winnerFilter: document.getElementById("winnerFilter"),
+  btnAddMatch: document.getElementById("btnAddMatch"),
+  matchesTbody: document.getElementById("matchesTbody"),
+
+  entriesDay: document.getElementById("entriesDay"),
+  entriesMatch: document.getElementById("entriesMatch"),
+  btnEntriesRefresh: document.getElementById("btnEntriesRefresh"),
+  entriesTbody: document.getElementById("entriesTbody"),
+
+  matchModalBack: document.getElementById("matchModalBack"),
+  mmTitle: document.getElementById("mmTitle"),
+  mmSub: document.getElementById("mmSub"),
+  mmClose: document.getElementById("mmClose"),
+  mmHome: document.getElementById("mmHome"),
+  mmAway: document.getElementById("mmAway"),
+  mmKickoff: document.getElementById("mmKickoff"),
+  mmId: document.getElementById("mmId"),
+  mmPreview: document.getElementById("mmPreview"),
+  mmDelete: document.getElementById("mmDelete"),
+  mmCancel: document.getElementById("mmCancel"),
+  mmSave: document.getElementById("mmSave")
+};
+
+function toast(msg){
+  els.toast.textContent = msg;
+  els.toast.style.display = "block";
+  clearTimeout(window.__t);
+  window.__t = setTimeout(()=>els.toast.style.display="none", 2200);
 }
 
-// Convert datetime-local (YYYY-MM-DDTHH:mm) to Cairo ISO with +02:00 offset
-function toCairoIso(dtLocal){
-  // treat the provided datetime-local as Cairo local wall time
-  // produce ISO string with explicit +02:00 offset
-  if(!dtLocal) return null;
-  const [datePart, timePart] = dtLocal.split("T");
-  if(!datePart || !timePart) return null;
-  return `${datePart}T${timePart}:00+02:00`;
+function cairoDayKey(d=new Date()){
+  const parts = new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d);
+  const get = (t)=>parts.find(p=>p.type===t)?.value;
+  return get("year")+"-"+get("month")+"-"+get("day");
 }
-
-// Convert Cairo ISO to datetime-local string
-function isoToLocalInput(iso){
-  try{
-    const d = new Date(iso);
-    // format in Cairo timezone
-    const parts = new Intl.DateTimeFormat('en-CA', { timeZone:TZ, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(d);
-    const getp = (t)=>parts.find(p=>p.type===t)?.value;
-    const y=getp("year"), m=getp("month"), da=getp("day"), hh=getp("hour"), mm=getp("minute");
-    return `${y}-${m}-${da}T${hh}:${mm}`;
-  }catch{ return ""; }
+function fmtCairoTime(msOrIso){
+  const d = (typeof msOrIso === "number") ? new Date(msOrIso) : new Date(msOrIso);
+  return new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit"}).format(d);
 }
-
-function normalizeMatch(input){
-  const id = String(input.id || makeId());
-  const home = String(input.home || "").trim();
-  const away = String(input.away || "").trim();
-  const kickoffIso = String(input.kickoffIso || "").trim();
-  if(!home || !away) throw new Error("Home/Away required");
-  if(!kickoffIso) throw new Error("Kickoff required");
-  const dayKey = fmtDate(kickoffIso);
-  const time = fmtTime(kickoffIso);
-  const label = `${home} vs ${away} — ${time}`;
-  return {
-    id, home, away, kickoffIso,
-    dayKey, time, label,
-    cutoff: cutoffMs(kickoffIso)
-  };
+function fmtCairoFull(msOrIso){
+  const d = (typeof msOrIso === "number") ? new Date(msOrIso) : new Date(msOrIso);
+  return new Intl.DateTimeFormat("en-GB",{timeZone:TZ,day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}).format(d);
 }
+function safe(s){ return (s ?? "").toString().replaceAll("<","&lt;").replaceAll(">","&gt;"); }
 
-async function saveFlyer(){
-  const url = document.getElementById("flyerUrl").value.trim();
-  await set(ref(db, `${APP_PATH}/config/flyerUrl`), url || "");
-  log("Saved flyer URL.");
-}
-
-let chart;
-function renderChart(entries){
-  const day = todayKeyCairo();
-  const todays = entries.filter(e => (e.createdDayKey || e.dayKey) === day);
-  const buckets = new Array(24).fill(0);
-  todays.forEach(e => {
-    const tms = (typeof e.createdAt === "number") ? e.createdAt : Date.parse(e.createdAtIso || "");
-    if(!tms) return;
-    const hh = parseInt(new Intl.DateTimeFormat('en-US', {timeZone:TZ, hour:'2-digit', hour12:false}).format(new Date(tms)),10);
-    if(!Number.isNaN(hh)) buckets[hh] += 1;
-  });
-  const labels = buckets.map((_,i)=> String(i).padStart(2,'0')+":00");
-  const ctx = document.getElementById("chart").getContext("2d");
-  if(chart) chart.destroy();
-  chart = new Chart(ctx, {
-    type: "line",
-    data: { labels, datasets: [{ label: "Votes", data: buckets, tension: 0.25 }] },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: "#a7b0d6" } },
-        y: { ticks: { color: "#a7b0d6" } }
-      }
-    }
-  });
-}
-
+/* =========================
+   Data
+   ========================= */
 let allEntries = [];
-let currentDay = todayKeyCairo();
-let dayMatches = [];
-let allMatchesFlat = [];
-let selectedMatch = null;
-let resultsMap = {};
-let loadedMode = "day"; // "day" or "all"
+let resultsMap = {};     // matchId => winnerTeam (or object)
+let allMatches = [];     // flattened [{dayKey, ...match}]
+let chart = null;
+
+const todayKey = cairoDayKey();
+els.kpiDay.textContent = todayKey + " (Cairo)";
+els.dayFilter.value = todayKey;
+els.entriesDay.value = todayKey;
+
+function normalizeMatch(m, dayKeyHint=null){
+  const id = String(m.id ?? m.matchId ?? crypto.randomUUID());
+  const kickoffIso = m.kickoffIso ?? m.kickoffISO ?? m.kickoff ?? m.dateIso ?? m.date ?? null;
+  const home = m.home ?? m.homeTeam ?? m.team1 ?? m.localteam ?? m.home_name ?? "";
+  const away = m.away ?? m.awayTeam ?? m.team2 ?? m.visitorteam ?? m.away_name ?? "";
+  if(!kickoffIso || !home || !away) return null;
+
+  const dayKey = m.dayKey || dayKeyHint || cairoDayKey(new Date(kickoffIso));
+  const label = m.label || `${home} vs ${away} — ${fmtCairoTime(kickoffIso)}`;
+
+  // voting cutoff: kickoff + (2h + 3m)
+  const cutoff = (typeof m.cutoff === "number") ? m.cutoff : (new Date(kickoffIso).getTime() + (2*60*60 + 3*60)*1000);
+
+  return { id, home, away, kickoffIso, dayKey, label, cutoff };
+}
+
+async function loadFlyerUrl(){
+  const snap = await db.ref(PATHS.flyerUrl).get();
+  els.flyerUrl.value = snap.exists() ? String(snap.val()||"") : "";
+}
+els.btnSaveFlyer.onclick = async ()=>{
+  await db.ref(PATHS.flyerUrl).set(els.flyerUrl.value.trim() || "");
+  toast("Flyer saved");
+};
+
+els.btnOpenWinner.onclick = ()=>{
+  // opens your winner page in same folder, no sidebars, simple
+  window.open("winner_v3.html", "_blank");
+};
+
+/* =========================
+   Matches load: scan recent range (lightweight) + day filter loads exact day
+   ========================= */
+async function loadMatchesForDay(dayKey){
+  const snap = await db.ref(PATHS.matchesByDate(dayKey)).get();
+  const arr = snap.exists() ? snap.val() : [];
+  const list = Array.isArray(arr) ? arr : [];
+  return list.map(m=>normalizeMatch(m, dayKey)).filter(Boolean);
+}
+
+async function refreshMatchesRange(centerDayKey){
+  // load +- 30 days around selected day (fast enough for RTDB)
+  const center = new Date(centerDayKey+"T12:00:00");
+  const days = [];
+  for(let i=-30;i<=30;i++){
+    const d = new Date(center);
+    d.setDate(d.getDate()+i);
+    days.push(cairoDayKey(d));
+  }
+  const out = [];
+  for(const dk of days){
+    try{
+      const list = await loadMatchesForDay(dk);
+      list.forEach(m=>out.push(m));
+    }catch(e){}
+  }
+  // de-dup by id (keep latest)
+  const map = new Map();
+  out.forEach(m=>map.set(m.id, m));
+  allMatches = Array.from(map.values()).sort((a,b)=>new Date(a.kickoffIso)-new Date(b.kickoffIso));
+  els.kpiMatches.textContent = allMatches.length;
+  renderMatchesTable();
+  rebuildEntriesMatchFilter();
+}
+
+els.btnRefresh.onclick = async ()=>{
+  toast("Refreshing…");
+  await loadResults();
+  await loadEntries();
+  await refreshMatchesRange(els.dayFilter.value || todayKey);
+  toast("Refreshed");
+};
+
+els.dayFilter.onchange = async ()=>{
+  await refreshMatchesRange(els.dayFilter.value || todayKey);
+};
+
+els.winnerFilter.onchange = ()=> renderMatchesTable();
 
 async function loadResults(){
-  const snap = await get(ref(db, `${APP_PATH}/results`));
-  resultsMap = snap.exists() ? snap.val() : {};
+  const snap = await db.ref(PATHS.results).get();
+  const v = snap.exists() ? snap.val() : {};
+  resultsMap = {};
+  // accept either "matchId: winnerTeam" OR "matchId: {winnerTeam}"
+  Object.keys(v||{}).forEach(k=>{
+    const val = v[k];
+    resultsMap[k] = (val && typeof val === "object") ? (val.winnerTeam ?? null) : val;
+  });
+  els.kpiResults.textContent = Object.values(resultsMap).filter(Boolean).length;
 }
 
 async function loadEntries(){
-  const snap = await get(ref(db, `${APP_PATH}/entries`));
+  const snap = await db.ref(PATHS.entries).get();
   const v = snap.exists() ? snap.val() : {};
-  allEntries = Object.entries(v).map(([id,e]) => ({...e, _id:id}));
-  document.getElementById("kTotal").textContent = allEntries.length;
-
-  const tday = todayKeyCairo();
-  const todayCount = allEntries.filter(e => (e.createdDayKey || e.dayKey) === tday).length;
-  document.getElementById("kToday").textContent = todayCount;
-
-  renderChart(allEntries);
-}
-
-function computeOpenClosed(m){
-  const st = (Date.now() >= (m.cutoff || cutoffMs(m.kickoffIso))) ? "Closed" : "Open";
-  return st;
-}
-
-function setUnresolvedKpi(){
-  const unresolved = allMatchesFlat.filter(m => !resultsMap?.[m.id]).length;
-  document.getElementById("kUnresolved").textContent = String(unresolved);
-}
-
-function setKpiCorrect(){
-  const el = document.getElementById("kCorrect");
-  if(!selectedMatch) { el.textContent = "0"; return; }
-  const winner = resultsMap?.[selectedMatch.id] || null;
-  if(!winner) { el.textContent = "0"; return; }
-  const correct = allEntries.filter(e => e.matchId === selectedMatch.id && e.pickedTeam === winner);
-  el.textContent = String(correct.length);
-}
-
-function renderEntries(){
-  const mode = document.getElementById("filterMode").value;
-  let rows = allEntries.slice();
-  const tday = todayKeyCairo();
-
-  if(mode === "today") rows = rows.filter(e => (e.createdDayKey || e.dayKey) === tday);
-  if(mode === "selectedMatch" && selectedMatch) rows = rows.filter(e => e.matchId === selectedMatch.id);
-  if(mode === "correctOnly" && selectedMatch) {
-    const winner = resultsMap?.[selectedMatch.id];
-    rows = winner ? rows.filter(e => e.matchId === selectedMatch.id && e.pickedTeam === winner) : [];
-  }
-  rows.sort((a,b)=> ( (b.createdAt||0) - (a.createdAt||0) ));
-
-  // table (desktop)
-  const tb = document.querySelector("#tbl tbody");
-  tb.innerHTML = "";
-  rows.slice(0, 500).forEach(e => {
-    const tr = document.createElement("tr");
-    const tms = (typeof e.createdAt === "number") ? e.createdAt : Date.parse(e.createdAtIso || "");
-    const time = tms ? new Intl.DateTimeFormat('en-US', {timeZone:TZ, hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short'}).format(new Date(tms)) : "—";
-    tr.innerHTML = `
-      <td>${(e.fullName||"—")}</td>
-      <td>${(e.phone||"—")}</td>
-      <td>${(e.email||"—")}</td>
-      <td>${(e.matchLabel||e.matchId||"—")}</td>
-      <td>${(e.pickedTeam||"—")}</td>
-      <td>${time}</td>
-    `;
-    tb.appendChild(tr);
-  });
-
-  // cards (mobile)
-  const cards = document.getElementById("entriesCards");
-  cards.innerHTML = "";
-  rows.slice(0, 200).forEach(e => {
-    const div = document.createElement("div");
-    div.className = "entryCard";
-    const tms = (typeof e.createdAt === "number") ? e.createdAt : Date.parse(e.createdAtIso || "");
-    const time = tms ? new Intl.DateTimeFormat('en-US', {timeZone:TZ, hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short'}).format(new Date(tms)) : "—";
-    div.innerHTML = `
-      <div class="name">${(e.fullName||"—")}</div>
-      <div class="meta">
-        <div>📞 ${(e.phone||"—")} • ✉️ ${(e.email||"—")}</div>
-        <div>🏟️ ${(e.matchLabel||e.matchId||"—")}</div>
-        <div>✅ Pick: <b>${(e.pickedTeam||"—")}</b> • ⏱️ ${time}</div>
-      </div>
-    `;
-    cards.appendChild(div);
-  });
-}
-
-async function readDayMatches(dayKey){
-  const snap = await get(ref(db, `${APP_PATH}/cache/matchesByDate/${dayKey}/matches`));
-  const arr = snap.exists() ? (snap.val() || []) : [];
-  return Array.isArray(arr) ? arr : [];
-}
-
-async function writeDayMatches(dayKey, arr){
-  await set(ref(db, `${APP_PATH}/cache/matchesByDate/${dayKey}/matches`), arr);
-  await update(ref(db, `${APP_PATH}/cache/matchesByDate/${dayKey}`), { fetchedAt: Date.now() });
-}
-
-function refreshMatchCountHint(){
-  const hint = document.getElementById("matchCountHint");
-  const list = (loadedMode === "all") ? allMatchesFlat : dayMatches;
-  hint.textContent = list.length ? `Loaded matches: ${list.length}` : "No matches loaded yet.";
-}
-
-async function loadDay(dayKey){
-  loadedMode = "day";
-  currentDay = dayKey;
-  document.getElementById("dayChip").textContent = `Day: ${dayKey}`;
-  dayMatches = await readDayMatches(dayKey);
-  dayMatches.sort((a,b)=> new Date(a.kickoffIso) - new Date(b.kickoffIso));
-  allMatchesFlat = dayMatches.slice();
-
-  populateMatchSelect();
-  refreshMatchCountHint();
-  setUnresolvedKpi();
-  setKpiCorrect();
-  renderEntries();
-}
-
-async function loadAllDays(){
-  loadedMode = "all";
-  document.getElementById("dayChip").textContent = `Day: All`;
-  const snap = await get(ref(db, `${APP_PATH}/cache/matchesByDate`));
-  const root = snap.exists() ? (snap.val() || {}) : {};
-  const flat = [];
-  Object.keys(root).forEach(dayKey => {
-    const arr = root?.[dayKey]?.matches;
-    if(Array.isArray(arr)) {
-      arr.forEach(m => flat.push({ ...m, dayKey: m.dayKey || dayKey }));
+  allEntries = Object.entries(v).map(([id,e])=>({ _id:id, ...(e||{}) }));
+  els.kpiVoters.textContent = allEntries.length;
+  const today = todayKey;
+  const todays = allEntries.filter(e=>{
+    const dk = e.dayKey || (e.kickoffIso ? cairoDayKey(new Date(e.kickoffIso)) : null);
+    // many entries in your voting page do not store dayKey, so compute from createdAt
+    if(e.createdAt){
+      return cairoDayKey(new Date(e.createdAt)) === today;
     }
+    return dk === today;
   });
-  flat.sort((a,b)=> new Date(a.kickoffIso) - new Date(b.kickoffIso));
-  allMatchesFlat = flat;
-  dayMatches = [];
-  populateMatchSelect();
-  refreshMatchCountHint();
-  setUnresolvedKpi();
-  setKpiCorrect();
-  renderEntries();
+  els.kpiToday.textContent = todays.length;
+  renderVotesChart(todays);
+  renderEntriesTable();
 }
 
-function populateMatchSelect(){
-  const toggle = document.getElementById("unresolvedToggle").value;
-  const sel = document.getElementById("matchSel");
-  sel.innerHTML = "";
+function renderVotesChart(todays){
+  const buckets = new Array(24).fill(0);
+  todays.forEach(e=>{
+    const t = e.createdAt ? new Date(e.createdAt) : (e.createdAtIso ? new Date(e.createdAtIso) : null);
+    if(!t) return;
+    const hh = parseInt(new Intl.DateTimeFormat("en-US",{timeZone:TZ,hour:"2-digit",hour12:false}).format(t),10);
+    if(!Number.isNaN(hh)) buckets[hh] += 1;
+  });
+  const labels = buckets.map((_,i)=>String(i).padStart(2,"0")+":00");
+  const ctx = document.getElementById("chartVotes").getContext("2d");
+  if(chart) chart.destroy();
+  chart = new Chart(ctx,{
+    type:"line",
+    data:{ labels, datasets:[{ label:"Votes", data:buckets, tension:.25 }]},
+    options:{ responsive:true, plugins:{ legend:{ display:false } } }
+  });
+}
 
-  const list = (loadedMode === "all") ? allMatchesFlat : allMatchesFlat; // (same variable)
-  let filtered = list.slice();
-  if(toggle === "unresolved") filtered = filtered.filter(m => !resultsMap?.[m.id]);
+/* =========================
+   Matches table rendering
+   ========================= */
+function hasWinner(matchId){ return !!resultsMap?.[matchId]; }
 
-  if(!filtered.length){
-    const o = document.createElement("option");
-    o.value = "";
-    o.textContent = (toggle === "unresolved") ? "No unresolved matches" : "No matches loaded";
-    sel.appendChild(o);
-    sel.disabled = true;
-    selectedMatch = null;
-    onSelectMatch(null);
+function applyMatchFilters(list){
+  const day = (els.dayFilter.value || "").trim();
+  const wf = els.winnerFilter.value;
+  let out = list.slice();
+  if(day) out = out.filter(m=>m.dayKey === day);
+  if(wf === "noWinner") out = out.filter(m=>!hasWinner(m.id));
+  if(wf === "hasWinner") out = out.filter(m=>hasWinner(m.id));
+  return out;
+}
+
+function renderMatchesTable(){
+  const list = applyMatchFilters(allMatches).sort((a,b)=>new Date(a.kickoffIso)-new Date(b.kickoffIso));
+  els.matchesTbody.innerHTML = "";
+  if(!list.length){
+    els.matchesTbody.innerHTML = "<tr><td colspan='5' class='small'>No matches for this filter.</td></tr>";
     return;
   }
 
-  sel.disabled = false;
-  const ph = document.createElement("option");
-  ph.value = "";
-  ph.textContent = "Select a match…";
-  sel.appendChild(ph);
+  list.forEach(m=>{
+    const tr = document.createElement("tr");
+    const winner = resultsMap?.[m.id] || "";
+    const status = (Date.now() >= (m.cutoff||0)) ? "Closed" : "Open";
+    const badge = winner ? "<span class='badge ok'>Winner set</span>" : "<span class='badge no'>No winner</span>";
+    tr.innerHTML = `
+      <td>${safe(m.dayKey)}</td>
+      <td>${safe(fmtCairoTime(m.kickoffIso))}</td>
+      <td>
+        <div style="font-weight:900">${safe(m.home)} <span style="opacity:.7">vs</span> ${safe(m.away)}</div>
+        <div class="small">Status: ${status} • ID: ${safe(m.id)}</div>
+      </td>
+      <td>
+        ${badge}
+        <div style="margin-top:6px">${winner ? "<b>"+safe(winner)+"</b>" : "<span class='small'>—</span>"}</div>
+      </td>
+      <td>
+        <div class="row" style="gap:10px">
+          <button class="btn ghost" data-act="winner" data-id="${safe(m.id)}">Choose winner</button>
+          <button class="btn ghost" data-act="edit" data-id="${safe(m.id)}">Edit</button>
+          <button class="btn danger" data-act="delete" data-id="${safe(m.id)}">Delete</button>
+        </div>
+      </td>
+    `;
+    els.matchesTbody.appendChild(tr);
+  });
+}
 
-  filtered.forEach(m => {
-    const o = document.createElement("option");
-    o.value = m.id;
-    const day = m.dayKey || fmtDate(m.kickoffIso);
-    o.textContent = (loadedMode === "all") ? `[${day}] ${m.label || (m.home+" vs "+m.away+" — "+fmtTime(m.kickoffIso))}` : (m.label || (m.home+" vs "+m.away+" — "+fmtTime(m.kickoffIso)));
-    sel.appendChild(o);
+els.matchesTbody.addEventListener("click", async (e)=>{
+  const btn = e.target.closest("button[data-act]");
+  if(!btn) return;
+  const act = btn.getAttribute("data-act");
+  const id = btn.getAttribute("data-id");
+  const match = allMatches.find(x=>x.id===id);
+  if(!match) return;
+
+  if(act === "edit") return openMatchModal("edit", match);
+  if(act === "delete") return deleteMatch(match);
+  if(act === "winner") return openWinnerChooser(match);
+});
+
+/* =========================
+   Add / Edit / Delete match
+   ========================= */
+function openModal(){ els.matchModalBack.style.display="flex"; document.body.style.overflow="hidden"; }
+function closeModal(){ els.matchModalBack.style.display="none"; document.body.style.overflow=""; }
+
+els.mmClose.onclick = closeModal;
+els.mmCancel.onclick = closeModal;
+els.matchModalBack.addEventListener("click",(e)=>{ if(e.target === els.matchModalBack) closeModal(); });
+
+let modalMode = "add";
+let modalOriginal = null;
+
+function kickoffLocalValueFromIso(iso){
+  // datetime-local expects "YYYY-MM-DDTHH:mm"
+  const d = new Date(iso);
+  const parts = new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(d);
+  const g=t=>parts.find(p=>p.type===t)?.value;
+  return `${g("year")}-${g("month")}-${g("day")}T${g("hour")}:${g("minute")}`;
+}
+
+function isoFromCairoDatetimeLocal(dtLocal){
+  // dtLocal is "YYYY-MM-DDTHH:mm". We will append Cairo offset +02:00 (works for Cairo standard).
+  // This is consistent with your previous templates.
+  if(!dtLocal) return "";
+  return dtLocal + ":00+02:00";
+}
+
+function updateModalPreview(){
+  const home = els.mmHome.value.trim();
+  const away = els.mmAway.value.trim();
+  const kickoffLocal = els.mmKickoff.value.trim();
+  const kickoffIso = isoFromCairoDatetimeLocal(kickoffLocal);
+  const day = kickoffIso ? cairoDayKey(new Date(kickoffIso)) : "—";
+  els.mmPreview.textContent = (home && away && kickoffIso)
+    ? `Preview: ${home} vs ${away} — ${fmtCairoFull(kickoffIso)} • Day: ${day}`
+    : "Fill home, away, and kickoff to preview.";
+}
+
+[els.mmHome, els.mmAway, els.mmKickoff, els.mmId].forEach(x=>x.addEventListener("input", updateModalPreview));
+
+function openMatchModal(mode, match=null){
+  modalMode = mode;
+  modalOriginal = match;
+
+  els.mmDelete.style.display = "none";
+  els.mmTitle.textContent = (mode === "add") ? "Add match" : "Edit match";
+  els.mmHome.value = match ? match.home : "";
+  els.mmAway.value = match ? match.away : "";
+  els.mmKickoff.value = match ? kickoffLocalValueFromIso(match.kickoffIso) : "";
+  els.mmId.value = match ? match.id : "";
+  els.mmId.disabled = (mode === "edit"); // prevent ID changes to keep results linked
+  updateModalPreview();
+  openModal();
+}
+
+els.btnAddMatch.onclick = ()=> openMatchModal("add", null);
+
+async function writeMatchToDay(dayKey, matchList){
+  // keep array format, minimal
+  const out = matchList.map(m=>({
+    id: m.id,
+    home: m.home,
+    away: m.away,
+    kickoffIso: m.kickoffIso,
+    dayKey: m.dayKey,
+    label: m.label,
+    cutoff: m.cutoff
+  }));
+  await db.ref(PATHS.matchesByDate(dayKey)).set(out);
+  await db.ref(PATHS.matchesMeta(dayKey)).set(firebase.database.ServerValue.TIMESTAMP);
+}
+
+async function saveModal(){
+  const home = els.mmHome.value.trim();
+  const away = els.mmAway.value.trim();
+  const kickoffLocal = els.mmKickoff.value.trim();
+  const kickoffIso = isoFromCairoDatetimeLocal(kickoffLocal);
+  const idInput = els.mmId.value.trim();
+
+  if(!home || !away || !kickoffIso){
+    toast("Please fill home, away, kickoff");
+    return;
+  }
+
+  const dayKey = cairoDayKey(new Date(kickoffIso));
+  const id = (modalMode === "add")
+    ? (idInput || ("M_"+dayKey.replaceAll("-","") + "_" + Math.random().toString(16).slice(2,8).toUpperCase()))
+    : modalOriginal.id;
+
+  const match = normalizeMatch({ id, home, away, kickoffIso, dayKey });
+
+  if(modalMode === "add"){
+    const existing = await loadMatchesForDay(dayKey);
+    existing.push(match);
+    existing.sort((a,b)=>new Date(a.kickoffIso)-new Date(b.kickoffIso));
+    await writeMatchToDay(dayKey, existing);
+    toast("Match added");
+  } else {
+    // edit: may move days
+    const oldDay = modalOriginal.dayKey;
+    if(oldDay === dayKey){
+      const list = await loadMatchesForDay(dayKey);
+      const idx = list.findIndex(x=>x.id===modalOriginal.id);
+      if(idx>=0) list[idx] = match;
+      list.sort((a,b)=>new Date(a.kickoffIso)-new Date(b.kickoffIso));
+      await writeMatchToDay(dayKey, list);
+      toast("Match updated");
+    } else {
+      // remove from old day + add to new day
+      const oldList = (await loadMatchesForDay(oldDay)).filter(x=>x.id!==modalOriginal.id);
+      await writeMatchToDay(oldDay, oldList);
+      const newList = await loadMatchesForDay(dayKey);
+      newList.push(match);
+      newList.sort((a,b)=>new Date(a.kickoffIso)-new Date(b.kickoffIso));
+      await writeMatchToDay(dayKey, newList);
+      toast("Match moved & updated");
+    }
+  }
+
+  closeModal();
+  await loadResults();
+  await refreshMatchesRange(els.dayFilter.value || todayKey);
+  rebuildEntriesMatchFilter();
+}
+
+els.mmSave.onclick = saveModal;
+
+async function deleteMatch(match){
+  if(!confirm(`Delete match: ${match.home} vs ${match.away} (${match.dayKey})?`)) return;
+  const list = await loadMatchesForDay(match.dayKey);
+  const next = list.filter(x=>x.id!==match.id);
+  await writeMatchToDay(match.dayKey, next);
+
+  // keep results node untouched (so you can audit) — but if you want hard delete:
+  // await db.ref(`${PATHS.results}/${match.id}`).set(null);
+
+  toast("Match deleted");
+  await loadResults();
+  await refreshMatchesRange(els.dayFilter.value || todayKey);
+  rebuildEntriesMatchFilter();
+}
+
+/* =========================
+   Winner chooser
+   ========================= */
+async function openWinnerChooser(match){
+  // simple prompt-based chooser (fast + mobile friendly)
+  const already = resultsMap?.[match.id] || "";
+  const pick = prompt(`Set winner for:\n${match.home} vs ${match.away}\n\nType exactly one:\n- ${match.home}\n- ${match.away}`, already || match.home);
+  if(!pick) return;
+  if(pick !== match.home && pick !== match.away){
+    toast("Winner must be home or away team name");
+    return;
+  }
+  await db.ref(`${PATHS.results}/${match.id}`).set({ winnerTeam: pick, setAt: firebase.database.ServerValue.TIMESTAMP });
+  toast("Winner saved");
+  await loadResults();
+  renderMatchesTable();
+}
+
+/* =========================
+   Entries table
+   ========================= */
+function rebuildEntriesMatchFilter(){
+  const day = (els.entriesDay.value || todayKey).trim();
+  const matches = allMatches.filter(m=>m.dayKey===day).sort((a,b)=>new Date(a.kickoffIso)-new Date(b.kickoffIso));
+  const cur = els.entriesMatch.value;
+  els.entriesMatch.innerHTML = `<option value="">All matches</option>`;
+  matches.forEach(m=>{
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = `${m.home} vs ${m.away} — ${fmtCairoTime(m.kickoffIso)}`;
+    els.entriesMatch.appendChild(opt);
+  });
+  if(cur) els.entriesMatch.value = cur;
+}
+
+els.entriesDay.onchange = ()=>{
+  rebuildEntriesMatchFilter();
+  renderEntriesTable();
+};
+
+els.entriesMatch.onchange = renderEntriesTable;
+els.btnEntriesRefresh.onclick = async ()=>{ await loadResults(); await loadEntries(); toast("Entries refreshed"); };
+
+function renderEntriesTable(){
+  const day = (els.entriesDay.value || todayKey).trim();
+  const mid = els.entriesMatch.value;
+
+  const list = allEntries.filter(e=>{
+    const created = e.createdAt ? new Date(e.createdAt) : null;
+    const dk = created ? cairoDayKey(created) : (e.dayKey || null);
+    if(dk !== day) return false;
+    if(mid && String(e.matchId) !== String(mid)) return false;
+    return true;
+  }).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+
+  els.entriesTbody.innerHTML = "";
+  if(!list.length){
+    els.entriesTbody.innerHTML = "<tr><td colspan='6' class='small'>No entries for this filter.</td></tr>";
+    return;
+  }
+  list.slice(0,500).forEach(e=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${e.createdAt ? safe(fmtCairoTime(e.createdAt)) : "—"}</td>
+      <td>${safe(e.fullName||"—")}</td>
+      <td>${safe(e.phone||"—")}</td>
+      <td>${safe(e.email||"")}</td>
+      <td>${safe(e.matchLabel||e.matchId||"—")}</td>
+      <td>${safe(e.pickedTeam||"—")}</td>
+    `;
+    els.entriesTbody.appendChild(tr);
+  });
+}
+
+/* =========================
+   Exports
+   ========================= */
+els.btnCSV.onclick = ()=>{
+  // export entries for current entries filter
+  const day = (els.entriesDay.value || todayKey).trim();
+  const mid = els.entriesMatch.value;
+  const list = allEntries.filter(e=>{
+    const created = e.createdAt ? new Date(e.createdAt) : null;
+    const dk = created ? cairoDayKey(created) : (e.dayKey || null);
+    if(dk !== day) return false;
+    if(mid && String(e.matchId) !== String(mid)) return false;
+    return true;
   });
 
-  // auto-select first real item
-  sel.value = filtered[0].id;
-  onSelectMatch(filtered[0].id);
-}
-
-function onSelectMatch(matchId){
-  selectedMatch = matchId ? allMatchesFlat.find(m => String(m.id) === String(matchId)) : null;
-
-  document.getElementById("matchChip").textContent = selectedMatch ? `Match: ${selectedMatch.home} vs ${selectedMatch.away}` : "Match: —";
-  const st = selectedMatch ? computeOpenClosed(selectedMatch) : "—";
-  const chip = document.getElementById("statusChip");
-  chip.textContent = `Status: ${st}`;
-  chip.className = "chip " + (st==="Open"?"open":(st==="Closed"?"closed":""));
-
-  // winner select
-  const ws = document.getElementById("winnerTeamSel");
-  ws.innerHTML = "";
-  if(!selectedMatch){
-    ws.disabled = true;
-    document.getElementById("setResultBtn").disabled = true;
-  } else {
-    [selectedMatch.home, selectedMatch.away].forEach(t => {
-      const o = document.createElement("option");
-      o.value = t; o.textContent = t;
-      ws.appendChild(o);
-    });
-    ws.disabled = false;
-    document.getElementById("setResultBtn").disabled = false;
-    const already = resultsMap?.[selectedMatch.id];
-    if(already) ws.value = already;
-  }
-
-  document.getElementById("editMatchBtn").disabled = !selectedMatch;
-  document.getElementById("deleteMatchBtn").disabled = !selectedMatch;
-
-  setKpiCorrect();
-  renderEntries();
-
-  // sync addDay preview
-  if(selectedMatch?.kickoffIso){
-    document.getElementById("addDay").value = fmtDate(selectedMatch.kickoffIso);
-  }
-}
-
-async function setResult(){
-  if(!selectedMatch) return;
-  const winner = document.getElementById("winnerTeamSel").value;
-  await set(ref(db, `${APP_PATH}/results/${selectedMatch.id}`), winner);
-  resultsMap[selectedMatch.id] = winner;
-  log(`Set winner for ${selectedMatch.id} = ${winner}`);
-  setUnresolvedKpi();
-  setKpiCorrect();
-  populateMatchSelect();
-  renderEntries();
-}
-
-function openWinner(){
-  const hash = selectedMatch ? `#day=${encodeURIComponent(selectedMatch.dayKey || currentDay)}&match=${encodeURIComponent(selectedMatch.id)}` : "";
-  window.open("winner_v3.html"+hash, "_blank");
-}
-
-async function exportCSV(){
-  const mode = document.getElementById("filterMode").value;
-  let rows = allEntries.slice();
-  const tday = todayKeyCairo();
-  if(mode === "today") rows = rows.filter(e => (e.createdDayKey || e.dayKey) === tday);
-  if(mode === "selectedMatch" && selectedMatch) rows = rows.filter(e => e.matchId === selectedMatch.id);
-  if(mode === "correctOnly" && selectedMatch) {
-    const winner = resultsMap?.[selectedMatch.id];
-    rows = winner ? rows.filter(e => e.matchId === selectedMatch.id && e.pickedTeam === winner) : [];
-  }
-  const header = ["fullName","phone","email","matchId","matchLabel","pickedTeam","dayKey","createdDayKey","kickoffIso","createdAt"];
-  const csv = [header.join(",")].concat(rows.map(r => header.map(k => JSON.stringify(r[k] ?? "")).join(","))).join("\\n");
+  const header = ["createdAtCairo","fullName","phone","email","matchId","matchLabel","pickedTeam"];
+  const rows = [header].concat(list.map(e=>[
+    e.createdAt ? fmtCairoTime(e.createdAt) : "",
+    e.fullName||"", e.phone||"", e.email||"",
+    e.matchId||"", e.matchLabel||"", e.pickedTeam||""
+  ]));
+  const csv = rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `afcon_entries_${mode}_${todayKeyCairo()}.csv`;
+  a.download = `afcon_entries_${day}${mid?("_"+mid):""}.csv`;
   a.click();
-}
+  URL.revokeObjectURL(a.href);
+  toast("CSV exported");
+};
 
-async function exportPDF(){
-  const area = document.getElementById("exportArea");
-  const canvas = await html2canvas(area, {scale:2, backgroundColor:null});
+els.btnPDF.onclick = async ()=>{
+  toast("Preparing PDF…");
+  const canvas = await html2canvas(els.exportArea, {backgroundColor:null, scale: window.devicePixelRatio>1 ? 2 : 1});
   const img = canvas.toDataURL("image/png");
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({orientation:"p", unit:"pt", format:"a4"});
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
-  const ratio = Math.min(pageW/canvas.width, pageH/canvas.height);
-  const w = canvas.width * ratio;
-  const h = canvas.height * ratio;
-  pdf.addImage(img, "PNG", (pageW-w)/2, 18, w, h);
-  pdf.save(`afcon_dashboard_${todayKeyCairo()}.pdf`);
-}
 
-async function addMatch(){
-  const home = document.getElementById("addHome").value.trim();
-  const away = document.getElementById("addAway").value.trim();
-  const dtLocal = document.getElementById("addKickoff").value;
-  if(!home || !away || !dtLocal){ alert("Please fill home, away, and kickoff."); return; }
+  const imgW = pageW;
+  const imgH = canvas.height * (imgW / canvas.width);
 
-  const kickoffIso = toCairoIso(dtLocal);
-  const m = normalizeMatch({ home, away, kickoffIso });
-  const dk = m.dayKey;
-
-  // load that day array, append, write back
-  const arr = await readDayMatches(dk);
-  const exists = arr.some(x => String(x.id) === String(m.id));
-  if(exists){ alert("Match ID collision. Try again."); return; }
-  arr.push(m);
-  arr.sort((a,b)=> new Date(a.kickoffIso) - new Date(b.kickoffIso));
-  await writeDayMatches(dk, arr);
-
-  log(`Added match [${dk}] ${m.label} (${m.id})`);
-
-  // reload view
-  document.getElementById("addHome").value = "";
-  document.getElementById("addAway").value = "";
-  document.getElementById("addKickoff").value = "";
-  document.getElementById("addDay").value = "";
-
-  if(loadedMode === "all") await loadAllDays();
-  else await loadDay(dk);
-}
-
-async function deleteSelectedMatch(){
-  if(!selectedMatch) return;
-  const ok = confirm(`Delete match?\\n\\n${selectedMatch.label || (selectedMatch.home+" vs "+selectedMatch.away)}\\nID: ${selectedMatch.id}`);
-  if(!ok) return;
-
-  const dk = selectedMatch.dayKey || fmtDate(selectedMatch.kickoffIso);
-  const arr = await readDayMatches(dk);
-  const next = arr.filter(m => String(m.id) !== String(selectedMatch.id));
-  await writeDayMatches(dk, next);
-  log(`Deleted match ${selectedMatch.id} from day ${dk}.`);
-
-  if(loadedMode === "all") await loadAllDays();
-  else await loadDay(dk);
-}
-
-function openEditModal(){
-  if(!selectedMatch) return;
-  document.getElementById("mHome").value = selectedMatch.home || "";
-  document.getElementById("mAway").value = selectedMatch.away || "";
-  document.getElementById("mKick").value = isoToLocalInput(selectedMatch.kickoffIso);
-  document.getElementById("mId").value = selectedMatch.id || "";
-  showModal(true);
-}
-
-function showModal(on){
-  const back = document.getElementById("modalBack");
-  back.style.display = on ? "flex" : "none";
-}
-
-async function saveEditModal(){
-  if(!selectedMatch) return;
-
-  const home = document.getElementById("mHome").value.trim();
-  const away = document.getElementById("mAway").value.trim();
-  const dtLocal = document.getElementById("mKick").value;
-  if(!home || !away || !dtLocal){ alert("Please fill home, away, and kickoff."); return; }
-
-  const kickoffIso = toCairoIso(dtLocal);
-  const updated = normalizeMatch({ id: selectedMatch.id, home, away, kickoffIso });
-
-  const oldDay = selectedMatch.dayKey || fmtDate(selectedMatch.kickoffIso);
-  const newDay = updated.dayKey;
-
-  if(oldDay === newDay){
-    const arr = await readDayMatches(oldDay);
-    const next = arr.map(m => (String(m.id)===String(updated.id)) ? updated : m);
-    next.sort((a,b)=> new Date(a.kickoffIso) - new Date(b.kickoffIso));
-    await writeDayMatches(oldDay, next);
-  } else {
-    // remove from old day, add to new day
-    const oldArr = await readDayMatches(oldDay);
-    const oldNext = oldArr.filter(m => String(m.id) !== String(updated.id));
-    await writeDayMatches(oldDay, oldNext);
-
-    const newArr = await readDayMatches(newDay);
-    newArr.push(updated);
-    newArr.sort((a,b)=> new Date(a.kickoffIso) - new Date(b.kickoffIso));
-    await writeDayMatches(newDay, newArr);
+  let remaining = imgH;
+  let offset = 0;
+  while(remaining > 0){
+    pdf.addImage(img, "PNG", 0, -offset, imgW, imgH);
+    remaining -= pageH;
+    offset += pageH;
+    if(remaining > 0) pdf.addPage();
   }
+  pdf.save(`afcon_dashboard_${todayKey}.pdf`);
+  toast("PDF exported");
+};
 
-  log(`Edited match ${updated.id} (moved day ${oldDay} → ${newDay}).`);
-
-  showModal(false);
-  if(loadedMode === "all") await loadAllDays();
-  else await loadDay(newDay);
-}
-
-document.getElementById("saveFlyerBtn").addEventListener("click", saveFlyer);
-document.getElementById("loadDayBtn").addEventListener("click", () => {
-  const v = document.getElementById("dayPick").value;
-  if(!v) return;
-  loadDay(v);
-});
-document.getElementById("loadAllBtn").addEventListener("click", loadAllDays);
-document.getElementById("unresolvedToggle").addEventListener("change", populateMatchSelect);
-document.getElementById("matchSel").addEventListener("change", (e)=> onSelectMatch(e.target.value));
-document.getElementById("setResultBtn").addEventListener("click", setResult);
-document.getElementById("openWinnerBtn").addEventListener("click", openWinner);
-document.getElementById("refreshBtn").addEventListener("click", async ()=>{ await loadResults(); await loadEntries(); setUnresolvedKpi(); setKpiCorrect(); populateMatchSelect(); renderEntries(); });
-document.getElementById("csvBtn").addEventListener("click", exportCSV);
-document.getElementById("pdfBtn").addEventListener("click", exportPDF);
-
-document.getElementById("addMatchBtn").addEventListener("click", addMatch);
-document.getElementById("editMatchBtn").addEventListener("click", openEditModal);
-document.getElementById("deleteMatchBtn").addEventListener("click", deleteSelectedMatch);
-
-// kickoff -> auto day preview
-document.getElementById("addKickoff").addEventListener("change", () => {
-  const dt = document.getElementById("addKickoff").value;
-  const iso = toCairoIso(dt);
-  if(iso) document.getElementById("addDay").value = fmtDate(iso);
-});
-
-document.getElementById("modalClose").addEventListener("click", ()=>showModal(false));
-document.getElementById("modalCancel").addEventListener("click", ()=>showModal(false));
-document.getElementById("modalBack").addEventListener("click", (e)=>{ if(e.target.id==="modalBack") showModal(false); });
-document.getElementById("modalSave").addEventListener("click", saveEditModal);
-
+/* =========================
+   Init
+   ========================= */
 (async function init(){
-  document.getElementById("dayPick").value = todayKeyCairo();
-
-  // load flyer url
-  const f = await get(ref(db, `${APP_PATH}/config/flyerUrl`));
-  if(f.exists()) document.getElementById("flyerUrl").value = f.val() || "";
-
-  await loadResults();
-  await loadEntries();
-  await loadDay(todayKeyCairo());
+  try{
+    await loadFlyerUrl();
+    await loadResults();
+    await loadEntries();
+    await refreshMatchesRange(todayKey);
+    rebuildEntriesMatchFilter();
+    toast("Dashboard ready");
+  }catch(e){
+    console.error(e);
+    toast("Dashboard loaded with warnings (check RTDB rules).");
+  }
 })();
 </script>
-
 </body>
 </html>
