@@ -14,30 +14,41 @@
   --radius:18px; --shadow:0 18px 50px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
-html,body{height:100%;min-height:100vh;background:var(--bg);color:var(--ink);}
+html,body{height:100%;min-height:100vh;background:var(--bg);color:var(--ink);font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial;}
 .wrap{height:100%;overflow:auto;scroll-snap-type:y mandatory;}
 .screen{min-height:100vh;scroll-snap-align:start;position:relative;}
-.hero{display:flex;align-items:flex-end;justify-content:center; position:relative;min-height:100vh;overflow:hidden;}
-.heroImg{position:absolute;inset:0;background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820") center center / contain no-repeat;}
+.hero{display:flex;align-items:flex-end;justify-content:center; position:relative;min-height:100svh;overflow:hidden;}
+.hero::before{
+  content:"";position:absolute;inset:0;
+  background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820") center center / cover no-repeat;
+  filter:blur(22px);transform:scale(1.08);opacity:.55;
+}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.72));}
+.heroImg{position:absolute;inset:0;z-index:1;background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820") center center / contain no-repeat;background-color:#000;pointer-events:none;}
+.heroShade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.25),rgba(0,0,0,.75));pointer-events:none;z-index:2;}
 
-.heroShade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.25),rgba(0,0,0,.75));}
-
-    .heroImg{pointer-events:none}
-    .heroShade{pointer-events:none}
-    .heroFooter{position:absolute;left:0;right:0;bottom:18px;z-index:10;display:flex;justify-content:center;pointer-events:auto}
-    .ctaRow{width:100%;display:flex;justify-content:center}
-    #btnVote{min-width:min(520px,92vw);padding:18px 22px;border-radius:22px;font-size:22px;font-weight:900;letter-spacing:.2px;box-shadow:0 18px 40px rgba(0,0,0,.35);background:linear-gradient(135deg,#22c55e,#16a34a);border:0;color:#06130b}
 .heroFooter{position:absolute;left:0;right:0;bottom:18px;z-index:10;display:flex;justify-content:center;pointer-events:auto}
-.ctaRow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
-.pill{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.10);backdrop-filter:blur(8px);}
-.btn{appearance:none;border:0;cursor:pointer;padding:12px 14px;border-radius:14px;font-weight:800;letter-spacing:.2px;}
-.btn.primary{background:linear-gradient(135deg,var(--accent),#16a34a);color:#071014;}
-.btn.ghost{background:rgba(255,255,255,.12);color:var(--ink);border:1px solid var(--border);}
-.note{font-size:13px;color:var(--muted);line-height:1.35;}
+.ctaRow{width:100%;display:flex;justify-content:center}
+.voteBtn{
+  width:min(86%, 420px);
+  height:64px;
+  border-radius:999px;
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:.2px;
+  color:#06130b;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  border:none;
+  box-shadow:0 18px 40px rgba(0,0,0,.45);
+  cursor:pointer;
+}
+.voteBtn:active{transform:translateY(1px)}
+@media(max-width:420px){.voteBtn{width:92vw;font-size:20px;height:62px}}
+
 .formScreen{display:flex;align-items:center;justify-content:center;padding:22px 14px;}
 .bgBlur{position:absolute;inset:0;background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820") center center / contain no-repeat;filter:blur(14px);transform:scale(1.06);}
-
 .bgOverlay{position:absolute;inset:0;background:rgba(0,0,0,.62);}
+
 .card{position:relative;width:min(720px,92vw);background:rgba(255,255,255,.10);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(14px);overflow:hidden;}
 .cardHead{padding:18px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .cardHead h2{margin:0;font-size:18px;}
@@ -52,51 +63,10 @@ input::placeholder{color:rgba(248,250,252,.55)}
 .help{font-size:12px;color:var(--muted);margin-top:-6px;}
 .error{font-size:12px;color:#fecaca;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.22);padding:10px 12px;border-radius:14px;display:none;}
 .ok{font-size:12px;color:#bbf7d0;background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.22);padding:10px 12px;border-radius:14px;display:none;}
+.btn{appearance:none;border:0;cursor:pointer;padding:14px 14px;border-radius:14px;font-weight:900;letter-spacing:.2px;}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#16a34a);color:#071014;}
 .footer{padding:12px 16px 18px;text-align:center;color:rgba(248,250,252,.55);font-size:12px;}
 .kickTag{font-weight:800;font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.08);}
-
-/* --- SevenApes tweaks (UI only) --- */
-.heroFooter .ctaRow{justify-content:center;}
-#btnVote{font-size:22px;padding:16px 28px;border-radius:18px;min-width:min(360px,92vw);}
-@media(max-width:420px){#btnVote{min-width:92vw;font-size:20px;padding:16px 22px;}}
-/* Show full flyer without cropping */
-.heroImg{background-color:#000;}
-
-.hero::before{
-  content:"";
-  position:absolute;inset:0;
-  background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820") center center / cover no-repeat;
-  filter:blur(22px);
-  transform:scale(1.08);
-  opacity:.55;
-}
-.hero::after{
-  content:"";
-  position:absolute;inset:0;
-  background:linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.72));
-}
-.hero{
-  min-height: 100svh;
-}
-
-.voteBtn{
-  position: absolute;
-  bottom: 1650%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(86%, 360px);
-  height: 64px;
-  border-radius: 999px;
-  font-size: 22px;
-  font-weight: 800;
-  color: #0b1a12;
-  background: linear-gradient(135deg,#22c55e,#16a34a);
-  border: none;
-  box-shadow: 0 18px 40px rgba(0,0,0,.45);
-}
-
-.heroInner{position:relative;z-index:3;}
-.heroImg{position:absolute;inset:0;z-index:1;background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820") center center / contain no-repeat;}
 
 </style>
 </head>
@@ -107,10 +77,9 @@ input::placeholder{color:rgba(248,250,252,.55)}
     <div class="heroShade"></div>
     <div class="heroFooter">
       <div class="ctaRow">
-<button id="openBtn" class="voteBtn">Vote now</button>
+        <button id="openBtn" class="voteBtn" type="button">Vote now</button>
       </div>
-      <div style="height:12px"></div>
-</div>
+    </div>
   </section>
 
   <section class="screen formScreen" id="formScreen">
@@ -121,7 +90,7 @@ input::placeholder{color:rgba(248,250,252,.55)}
       <div class="cardHead">
         <div>
           <h2>Pick the winning team</h2>
-          <div class="small" id="todayLabel">Today (Cairo)</div>
+          <div class="small" id="todayLabel">Cairo timezone</div>
         </div>
         <div class="kickTag" id="apiState">Loading…</div>
       </div>
@@ -141,24 +110,23 @@ input::placeholder{color:rgba(248,250,252,.55)}
           </div>
         </div>
 
-        <div class="two">
-          <div class="row">
-            <label>Email</label>
-            <input id="email" placeholder="optional@email.com" inputmode="email"/>
-          </div>
-          <div class="row">
-            <label>Date (Cairo)</label>
-            <input id="dateSel" type="date" required/>
-            <div class="help" id="dateHelp">For testing: pick a date to load matches from cache.</div>
-          </div>
+        <div class="row">
+          <label>Email (optional)</label>
+          <input id="email" placeholder="optional@email.com" inputmode="email"/>
+        </div>
 
-          <div class="row">
-            <label>Match you’re watching</label>
-            <select id="matchSel" required>
-              <option value="">Loading today’s matches…</option>
-            </select>
-            <div class="help" id="matchHelp"></div>
-          </div>
+        <div class="row">
+          <label>Date</label>
+          <input id="dateSel" type="date" required/>
+          <div class="help" id="dateHelp"></div>
+        </div>
+
+        <div class="row">
+          <label>Match you’re watching</label>
+          <select id="matchSel" required>
+            <option value="">Loading matches…</option>
+          </select>
+          <div class="help" id="matchHelp"></div>
         </div>
 
         <div class="row">
@@ -166,13 +134,13 @@ input::placeholder{color:rgba(248,250,252,.55)}
           <select id="teamSel" required disabled>
             <option value="">Select a match first</option>
           </select>
-          <div class="help">This dropdown auto-updates to the two teams in the selected match.</div>
+          <div class="help">This updates automatically based on the selected match.</div>
         </div>
 
         <button class="btn primary" type="submit">Submit vote</button>
       </form>
 
-      <div class="footer">Powered by SevenApes</div>
+      <div class="footer">Powered by Luma</div>
     </div>
   </section>
 </div>
@@ -181,15 +149,15 @@ input::placeholder{color:rgba(248,250,252,.55)}
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
-// ✅ Firebase config (paste your usual "events one" config here)
+// Firebase config (events-339ce RTDB)
 const firebaseConfig = {
-      apiKey: "AIzaSyA80bAAGPuyscnTVS-zwrxE9Jp3tPiS1gM",
-      authDomain: "events-339ce.firebaseapp.com",
-      databaseURL: "https://events-339ce-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "events-339ce",
-      storageBucket: "events-339ce.appspot.com",
-      messagingSenderId: "175601544315",
-      appId: "1:175601544315:web:00c94b4affa972b3a286de"
+  apiKey: "AIzaSyA80bAAGPuyscnTVS-zwrxE9Jp3tPiS1gM",
+  authDomain: "events-339ce.firebaseapp.com",
+  databaseURL: "https://events-339ce-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "events-339ce",
+  storageBucket: "events-339ce.appspot.com",
+  messagingSenderId: "175601544315",
+  appId: "1:175601544315:web:00c94b4affa972b3a286de"
 };
 
 const TZ = "Africa/Cairo";
@@ -205,6 +173,11 @@ function cairoDayKey(d=new Date()) {
   const get = (t)=>parts.find(p=>p.type===t)?.value;
   return get("year")+"-"+get("month")+"-"+get("day");
 }
+function dayKeyFromIsoInCairo(iso){
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year:"numeric", month:"2-digit", day:"2-digit" }).formatToParts(new Date(iso));
+  const get = (t)=>parts.find(p=>p.type===t)?.value;
+  return get("year")+"-"+get("month")+"-"+get("day");
+}
 function fmtCairoTime(isoOrMs) {
   const d = typeof isoOrMs === "number" ? new Date(isoOrMs) : new Date(isoOrMs);
   return new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour:"2-digit", minute:"2-digit" }).format(d);
@@ -215,13 +188,30 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const btnVote = document.getElementById("openBtn");
-if (btnVote) {
-  btnVote.addEventListener("click", () => {
-    const wrap = document.getElementById("wrap");
-    const form = document.getElementById("formScreen");
-    if (wrap && form) wrap.scrollTo({ top: form.offsetTop, behavior: "smooth" });
-  });
-}
+btnVote?.addEventListener("click", () => {
+  const wrap = document.getElementById("wrap");
+  const form = document.getElementById("formScreen");
+  if (wrap && form) wrap.scrollTo({ top: form.offsetTop, behavior: "smooth" });
+});
+
+// Swipe down on hero to open form (mobile)
+(function(){
+  const hero = document.getElementById("hero");
+  if(!hero) return;
+  let y0=null;
+  hero.addEventListener("touchstart", (e)=>{ y0 = e.touches?.[0]?.clientY ?? null; }, {passive:true});
+  hero.addEventListener("touchend", (e)=>{
+    if(y0==null) return;
+    const y1 = e.changedTouches?.[0]?.clientY ?? null;
+    if(y1!=null && (y1 - y0) > 60){
+      const wrap = document.getElementById("wrap");
+      const form = document.getElementById("formScreen");
+      if (wrap && form) wrap.scrollTo({ top: form.offsetTop, behavior: "smooth" });
+    }
+    y0=null;
+  }, {passive:true});
+})();
+
 const matchSel = document.getElementById("matchSel");
 const teamSel  = document.getElementById("teamSel");
 const dateSel  = document.getElementById("dateSel");
@@ -238,40 +228,6 @@ let matches = [];
 let selectedMatch = null;
 let dayKey = cairoDayKey();
 
-// Smooth scroll with controllable duration (slightly slower than default)
-function smoothScrollTo(targetY, durationMs){
-  const startY = window.pageYOffset || document.documentElement.scrollTop || 0;
-  const diff = targetY - startY;
-  const startT = performance.now();
-  const easeInOut = (t)=> t<0.5 ? 2*t*t : 1- Math.pow(-2*t+2,2)/2;
-  function step(now){
-    const p = Math.min(1, (now - startT) / durationMs);
-    const y = startY + diff * easeInOut(p);
-    window.scrollTo(0, y);
-    if (p < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-// Swipe down on hero to open form (mobile)
-(function(){
-  const hero = document.getElementById("hero");
-  if(!hero) return;
-  let y0=null;
-  hero.addEventListener("touchstart", (e)=>{ y0 = e.touches && e.touches[0] ? e.touches[0].clientY : null; }, {passive:true});
-  hero.addEventListener("touchend", (e)=>{
-    if(y0==null) return;
-    const y1 = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : null;
-  if(y1!=null && (y1 - y0) > 60){
-  const wrap = document.getElementById("wrap");
-  const form = document.getElementById("formScreen");
-  if (wrap && form) {
-    wrap.scrollTo({ top: form.offsetTop, behavior: "smooth" });
-  }
-}
-    y0=null;
-  }, {passive:true});
-})();
-
 function showErr(text) { err.style.display="block"; err.textContent=text; ok.style.display="none"; }
 function showOk(text) { ok.style.display="block"; ok.textContent=text; err.style.display="none"; }
 function clearMsgs() { err.style.display="none"; ok.style.display="none"; }
@@ -283,7 +239,7 @@ async function loadSettingsAndBranding() {
   const url = flyerUrl || fallback;
   heroImg.style.backgroundImage = `url('${url}')`;
   bgBlur.style.backgroundImage  = `url('${url}')`;
-  todayLabel.textContent = `Date (${TZ}) — ${dayKey}`;
+  todayLabel.textContent = `Cairo timezone • ${TZ}`;
 }
 
 function computeState(m) {
@@ -295,29 +251,29 @@ function computeState(m) {
 
 function renderMatches() {
   matchSel.innerHTML = "";
-  if (!matches.length) {
+  const openMatches = matches.filter(m => computeState(m).isOpen);
+  if (!openMatches.length) {
     const o = document.createElement("option");
-    o.value=""; o.textContent="No matches cached for this date yet.";
+    o.value=""; o.textContent="No open matches for this date.";
     matchSel.appendChild(o);
     matchSel.disabled = true;
     teamSel.disabled = true;
-    apiState.textContent = "No data";
+    apiState.textContent = "No matches";
     matchHelp.textContent = "";
     return;
   }
   matchSel.disabled = false;
   apiState.textContent = "Ready";
-  matchHelp.textContent = "Closed matches are visible but disabled.";
+  matchHelp.textContent = "Only open matches are shown.";
+
   const ph = document.createElement("option");
-  ph.value=""; ph.textContent="Select today’s match…";
+  ph.value=""; ph.textContent="Select a match…";
   matchSel.appendChild(ph);
 
-  matches.forEach(m => {
-    const st = computeState(m);
+  openMatches.forEach(m => {
     const opt = document.createElement("option");
     opt.value = m.id;
-    opt.textContent = m.home+" vs "+m.away+" — "+fmtCairoTime(m.kickoffIso) + (st.isOpen ? "" : " (Voting closed)");
-    opt.disabled = !st.isOpen;
+    opt.textContent = (m.label || (m.home+" vs "+m.away+" — "+fmtCairoTime(m.kickoffIso)));
     matchSel.appendChild(opt);
   });
 }
@@ -355,9 +311,8 @@ matchSel.addEventListener("change", () => {
   renderTeamsForMatch(selectedMatch);
 });
 
-async function loadTodayMatchesCache(dayOverride=null) {
+async function loadDayMatches(dayOverride=null) {
   dayKey = (dayOverride && String(dayOverride).trim()) ? String(dayOverride).trim() : cairoDayKey();
-  // Read cached matches for the selected day
   const snap = await db.ref(PATHS.matchesByDate(dayKey)).get();
   if (!snap.exists()) {
     matches = [];
@@ -400,6 +355,9 @@ document.getElementById("voteForm").addEventListener("submit", async (e) => {
   if (!st.isOpen) return showErr("Voting is closed for this match.");
   if (![m.home, m.away].includes(pickedTeam)) return showErr("Invalid team selection.");
 
+  const matchDayKey = dayKeyFromIsoInCairo(m.kickoffIso);
+  const createdDayKey = cairoDayKey(new Date());
+
   const payload = {
     fullName, phone,
     email: email || null,
@@ -407,6 +365,8 @@ document.getElementById("voteForm").addEventListener("submit", async (e) => {
     matchLabel: (m.label || (m.home+" vs "+m.away+" — "+fmtCairoTime(m.kickoffIso))),
     kickoffIso: m.kickoffIso,
     pickedTeam,
+    dayKey: matchDayKey,          // IMPORTANT: used by dashboard filters
+    createdDayKey: createdDayKey, // optional: "submitted today" KPI
     createdAt: firebase.database.ServerValue.TIMESTAMP,
     tz: TZ
   };
@@ -425,30 +385,21 @@ document.getElementById("voteForm").addEventListener("submit", async (e) => {
 });
 
 (async function init() {
-  // Date picker (testing)
+  // Date picker
   if (dateSel) {
     const dk = cairoDayKey();
     dateSel.value = dk;
-    if (dateHelp) dateHelp.textContent = `For testing: showing matches for ${dk} (Cairo)`;
+    if (dateHelp) dateHelp.textContent = `Showing matches for ${dk} (Cairo)`;
     dateSel.addEventListener("change", async () => {
       const val = dateSel.value || cairoDayKey();
-      if (dateHelp) dateHelp.textContent = `For testing: showing matches for ${val} (Cairo)`;
-      await loadTodayMatchesCache(val);
+      if (dateHelp) dateHelp.textContent = `Showing matches for ${val} (Cairo)`;
+      await loadDayMatches(val);
     });
   }
 
   await loadSettingsAndBranding();
-  await loadTodayMatchesCache((dateSel && dateSel.value) ? dateSel.value : null);
+  await loadDayMatches((dateSel && dateSel.value) ? dateSel.value : null);
 })();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
