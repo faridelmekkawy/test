@@ -75,6 +75,26 @@ input::placeholder{color:rgba(248,250,252,.55)}
   position:absolute;inset:0;
   background:linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.72));
 }
+.hero{
+  min-height: 100svh;
+}
+
+.voteBtn{
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(86%, 360px);
+  height: 64px;
+  border-radius: 999px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #0b1a12;
+  background: linear-gradient(135deg,#22c55e,#16a34a);
+  border: none;
+  box-shadow: 0 18px 40px rgba(0,0,0,.45);
+}
+
 .heroInner{position:relative;z-index:3;}
 .heroImg{position:absolute;inset:0;z-index:1;background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820") center center / contain no-repeat;}
 
@@ -87,7 +107,7 @@ input::placeholder{color:rgba(248,250,252,.55)}
     <div class="heroShade"></div>
     <div class="heroFooter">
       <div class="ctaRow">
-<button class="btn primary" id="btnVote">Vote now</button>
+<button id="openBtn" class="voteBtn">Vote now</button>
       </div>
       <div style="height:12px"></div>
 </div>
@@ -417,3 +437,4 @@ document.getElementById("voteForm").addEventListener("submit", async (e) => {
 </script>
 </body>
 </html>
+
