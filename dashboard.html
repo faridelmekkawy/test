@@ -393,8 +393,17 @@ els.btnOpenWinner.onclick = ()=>{
    ========================= */
 async function loadMatchesForDay(dayKey){
   const snap = await db.ref(PATHS.matchesByDate(dayKey)).get();
-  const arr = snap.exists() ? snap.val() : [];
-  const list = Array.isArray(arr) ? arr : [];
+  if(!snap.exists()) return [];
+  const data = snap.val();
+
+  // Support BOTH formats:
+  // 1) matches: [ {..}, {..} ]  (old)
+  // 2) matches: { matchId: {..}, ... } (new, editable)
+  // 3) matches wrapped accidentally as { matches: ... }
+  let raw = data;
+  if(raw && typeof raw === "object" && !Array.isArray(raw) && raw.matches) raw = raw.matches;
+
+  const list = Array.isArray(raw) ? raw : (raw && typeof raw === "object" ? Object.values(raw) : []);
   return list.map(m=>normalizeMatch(m, dayKey)).filter(Boolean);
 }
 
