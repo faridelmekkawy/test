@@ -151,9 +151,9 @@ const firebaseConfig = {
 
 const TZ = "Africa/Cairo";
 const PATHS = {
-  settings: "afconApp/settings",
-  todayMatches: (dayKey)=>"afconApp/cache/todayMatches/"+dayKey,
-  entries: (dayKey)=>"afconApp/entries/"+dayKey
+  configFlyerUrl: "afconApp/config/flyerUrl",
+  matchesByDate: (dayKey)=>"afconApp/cache/matchesByDate/"+dayKey+"/matches",
+  entries: "afconApp/entries"
 };
 const VOTE_WINDOW_MS = (2*60+3)*60*1000;
 
@@ -214,25 +214,27 @@ function showOk(text) { ok.style.display="block"; ok.textContent=text; err.style
 function clearMsgs() { err.style.display="none"; ok.style.display="none"; }
 
 async function loadSettingsAndBranding() {
-  const snap = await db.ref(PATHS.settings).get();
-  const s = snap.exists() ? snap.val() : {};
-  const flyerUrl = s.flyerUrl || "https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820";
-  heroImg.style.backgroundImage = "url('"+flyerUrl+"')";
-  bgBlur.style.backgroundImage  = "url('"+flyerUrl+"')";
-  todayLabel.textContent = "Today ("+TZ+") — "+dayKey;
+  const snap = await db.ref(PATHS.configFlyerUrl).get();
+  const flyerUrl = snap.exists() ? String(snap.val()||"").trim() : "";
+  const fallback = "https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820";
+  const url = flyerUrl || fallback;
+  heroImg.style.backgroundImage = `url('${url}')`;
+  bgBlur.style.backgroundImage  = `url('${url}')`;
+  todayLabel.textContent = `Date (${TZ}) — ${dayKey}`;
 }
 
 function computeState(m) {
-  const kickoffMs = new Date(m.kickoffISO).getTime();
-  const cutoffMs  = kickoffMs + VOTE_WINDOW_MS;
-  return { kickoffMs, cutoffMs, isOpen: nowMs() < cutoffMs };
+  const kickoffIso = m.kickoffIso || m.kickoffISO || m.kickoff || null;
+  const kickoffMs = kickoffIso ? new Date(kickoffIso).getTime() : NaN;
+  const cutoffMs = (typeof m.cutoff === 'number') ? m.cutoff : (kickoffIso ? (kickoffMs + VOTE_WINDOW_MS) : NaN);
+  return { kickoffMs, cutoffMs, isOpen: Number.isFinite(cutoffMs) ? (nowMs() < cutoffMs) : false };
 }
 
 function renderMatches() {
   matchSel.innerHTML = "";
   if (!matches.length) {
     const o = document.createElement("option");
-    o.value=""; o.textContent="No matches cached for today yet.";
+    o.value=""; o.textContent="No matches cached for this date yet.";
     matchSel.appendChild(o);
     matchSel.disabled = true;
     teamSel.disabled = true;
@@ -250,8 +252,8 @@ function renderMatches() {
   matches.forEach(m => {
     const st = computeState(m);
     const opt = document.createElement("option");
-    opt.value = m.matchId;
-    opt.textContent = m.home+" vs "+m.away+" — "+fmtCairoTime(m.kickoffISO) + (st.isOpen ? "" : " (Voting closed)");
+    opt.value = m.id;
+    opt.textContent = m.home+" vs "+m.away+" — "+fmtCairoTime(m.kickoffIso) + (st.isOpen ? "" : " (Voting closed)");
     opt.disabled = !st.isOpen;
     matchSel.appendChild(opt);
   });
@@ -281,7 +283,7 @@ function renderTeamsForMatch(m) {
 matchSel.addEventListener("change", () => {
   clearMsgs();
   const id = matchSel.value;
-  selectedMatch = matches.find(x => x.matchId == id) || null;
+  selectedMatch = matches.find(x => String(x.id) === String(id)) || null;
   if (!selectedMatch) {
     teamSel.disabled = true;
     teamSel.innerHTML = "<option value=''>Select a match first</option>";
@@ -292,15 +294,16 @@ matchSel.addEventListener("change", () => {
 
 async function loadTodayMatchesCache(dayOverride=null) {
   dayKey = (dayOverride && String(dayOverride).trim()) ? String(dayOverride).trim() : cairoDayKey();
-  const snap = await db.ref(PATHS.todayMatches(dayKey)).get();
+  // Read cached matches for the selected day
+  const snap = await db.ref(PATHS.matchesByDate(dayKey)).get();
   if (!snap.exists()) {
     matches = [];
     renderMatches();
     return;
   }
   const data = snap.val();
-  matches = Array.isArray(data.matches) ? data.matches : [];
-  matches.sort((a,b)=> new Date(a.kickoffISO)-new Date(b.kickoffISO));
+  matches = Array.isArray(data) ? data : [];
+  matches.sort((a,b)=> new Date(a.kickoffIso) - new Date(b.kickoffIso));
   renderMatches();
 }
 
@@ -310,7 +313,7 @@ setInterval(() => {
   renderMatches();
   if (cur) {
     matchSel.value = cur;
-    const m = matches.find(x=>x.matchId==cur);
+    const m = matches.find(x=>String(x.id)===String(cur));
     if (m) renderTeamsForMatch(m);
   }
 }, 60000);
@@ -327,7 +330,7 @@ document.getElementById("voteForm").addEventListener("submit", async (e) => {
 
   if (!fullName || !phone || !matchId || !pickedTeam) return showErr("Please fill all required fields.");
 
-  const m = matches.find(x => x.matchId == matchId);
+  const m = matches.find(x => String(x.id) === String(matchId));
   if (!m) return showErr("This match is not available right now.");
 
   const st = computeState(m);
@@ -337,16 +340,16 @@ document.getElementById("voteForm").addEventListener("submit", async (e) => {
   const payload = {
     fullName, phone,
     email: email || null,
-    matchId: m.matchId,
-    matchLabel: m.home+" vs "+m.away,
-    kickoffISO: m.kickoffISO,
+    matchId: m.id,
+    matchLabel: (m.label || (m.home+" vs "+m.away+" — "+fmtCairoTime(m.kickoffIso))),
+    kickoffIso: m.kickoffIso,
     pickedTeam,
     createdAt: firebase.database.ServerValue.TIMESTAMP,
     tz: TZ
   };
 
   try {
-    await db.ref(PATHS.entries(dayKey)).push(payload);
+    await db.ref(PATHS.entries).push(payload);
     showOk("✅ Vote submitted! Good luck.");
     document.getElementById("voteForm").reset();
     teamSel.disabled = true;
