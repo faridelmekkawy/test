@@ -20,14 +20,20 @@ html,body{height:100%;min-height:100vh;background:var(--bg);color:var(--ink);fon
 .hero{display:flex;align-items:flex-end;justify-content:center; position:relative;min-height:100svh;overflow:hidden;}
 .hero::before{
   content:"";position:absolute;inset:0;
-  background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/IMG_5132.jpeg?alt=media&token=ea21e869-8ee2-4f86-a9eb-d1f0413d12b0") center center / cover no-repeat;
-  filter:blur(22px);transform:scale(1.08);opacity:.55;
+  background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/IMG_5132.jpeg?alt=media&token=ea21e869-8ee2-4f86-a9eb-d1f0413d12b0") center center / cover no-repeat;  
 }
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.72));}
-.heroImg{position:absolute;inset:0;z-index:1;background:url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/IMG_5132.jpeg?alt=media&token=ea21e869-8ee2-4f86-a9eb-d1f0413d12b0") center center / contain no-repeat;background-color:#000;pointer-events:none;}
+.heroImg{
+  background: url("https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/IMG_5132.jpeg?alt=media&token=ea21e869-8ee2-4f86-a9eb-d1f0413d12b0")
+    center center / cover no-repeat;
+  background-color:#000;
+}
 .heroShade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.25),rgba(0,0,0,.75));pointer-events:none;z-index:2;}
 
-.heroFooter{position:absolute;left:0;right:0;bottom:18px;z-index:10;display:flex;justify-content:center;pointer-events:auto}
+.heroFooter{
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 999;
+}
 .ctaRow{width:100%;display:flex;justify-content:center}
 .voteBtn{
   width:min(86%, 420px);
@@ -236,7 +242,7 @@ async function loadSettingsAndBranding() {
   const snap = await db.ref(PATHS.configFlyerUrl).get();
   const flyerUrl = snap.exists() ? String(snap.val()||"").trim() : "";
 const fallback = "https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/IMG_5132.jpeg?alt=media&token=ea21e869-8ee2-4f86-a9eb-d1f0413d12b0";
-  const url = flyerUrl || fallback;
+  const url = "https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/IMG_5132.jpeg?alt=media&token=ea21e869-8ee2-4f86-a9eb-d1f0413d12b0";
   heroImg.style.backgroundImage = `url('${url}')`;
   bgBlur.style.backgroundImage  = `url('${url}')`;
   todayLabel.textContent = `Cairo timezone • ${TZ}`;
@@ -413,4 +419,5 @@ document.getElementById("voteForm").addEventListener("submit", async (e) => {
 </script>
 </body>
 </html>
+
 
