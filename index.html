@@ -235,7 +235,7 @@ function clearMsgs() { err.style.display="none"; ok.style.display="none"; }
 async function loadSettingsAndBranding() {
   const snap = await db.ref(PATHS.configFlyerUrl).get();
   const flyerUrl = snap.exists() ? String(snap.val()||"").trim() : "";
-  const fallback = "https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/WhatsApp%20Image%202025-12-16%20at%205.48.09%20PM.jpeg?alt=media&token=126fb0c7-2576-4265-a080-bb860e131820";
+const fallback = "https://firebasestorage.googleapis.com/v0/b/events-339ce.firebasestorage.app/o/IMG_5132.jpeg?alt=media&token=ea21e869-8ee2-4f86-a9eb-d1f0413d12b0";
   const url = flyerUrl || fallback;
   heroImg.style.backgroundImage = `url('${url}')`;
   bgBlur.style.backgroundImage  = `url('${url}')`;
@@ -413,3 +413,4 @@ document.getElementById("voteForm").addEventListener("submit", async (e) => {
 </script>
 </body>
 </html>
+
