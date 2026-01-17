@@ -79,6 +79,7 @@ tr:last-child td{border-bottom:0}
     <div class="actions">
       <button class="btn ghost" id="btnRefresh">Refresh</button>
       <button class="btn ghost" id="btnCSV">Export CSV</button>
+      <button class="btn ghost" id="btnUniqueCSV">Export Unique Voters CSV</button>
       <button class="btn warn" id="btnPDF">Export PDF snapshot</button>
     </div>
   </div>
@@ -286,6 +287,7 @@ const els = {
   exportArea: document.getElementById("exportArea"),
   btnRefresh: document.getElementById("btnRefresh"),
   btnCSV: document.getElementById("btnCSV"),
+  btnUniqueCSV: document.getElementById("btnUniqueCSV"),
   btnPDF: document.getElementById("btnPDF"),
 
   kpiDay: document.getElementById("kpiDay"),
@@ -805,6 +807,64 @@ els.btnCSV.onclick = ()=>{
   a.click();
   URL.revokeObjectURL(a.href);
   toast("CSV exported");
+};
+
+els.btnUniqueCSV.onclick = ()=>{
+  const dayKeyForEntry = (e)=>{
+    const created = e.createdAt ? new Date(e.createdAt) : null;
+    return created ? cairoDayKey(created) : (e.dayKey || "");
+  };
+  const personKeyForEntry = (e)=>{
+    const phone = (e.phone || "").trim();
+    const email = (e.email || "").trim().toLowerCase();
+    const name = (e.fullName || "").trim().toLowerCase();
+    return phone || email || name;
+  };
+
+  const sorted = allEntries.slice().sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  const uniqueMap = new Map();
+  sorted.forEach(e=>{
+    const personKey = personKeyForEntry(e);
+    if(!personKey) return;
+    uniqueMap.set(personKey, e);
+  });
+
+  const uniqueList = Array.from(uniqueMap.values());
+  const header = [
+    "dayKey",
+    "fullName",
+    "phone",
+    "email",
+    "matchId",
+    "matchLabel",
+    "kickoffIso",
+    "pickedTeam",
+    "winnerTeam"
+  ];
+  const rows = [header].concat(uniqueList.map(e=>{
+    const match = allMatches.find(m=>String(m.id)===String(e.matchId));
+    const winnerTeam = resultsMap?.[e.matchId] || "";
+    return [
+      dayKeyForEntry(e),
+      e.fullName||"",
+      e.phone||"",
+      e.email||"",
+      e.matchId||"",
+      e.matchLabel || (match ? `${match.home} vs ${match.away} — ${fmtCairoTime(match.kickoffIso)}` : ""),
+      e.kickoffIso || (match ? match.kickoffIso : ""),
+      e.pickedTeam||"",
+      winnerTeam
+    ];
+  }));
+
+  const csv = rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `afcon_unique_voters_${todayKey}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Unique voters CSV exported");
 };
 
 els.btnPDF.onclick = async ()=>{
